@@ -130,7 +130,7 @@ export default {
       // ajax 获取老人巡查列表
       // 参数 this.today
       this.elderData = [
-        { id: 110, name: '吴xx', sex: '男', age: 233, idCard: 1111111111, birthday: '2000-01-01', dataTime: '2018-04-13', temperature: '36', bloodPressure: '70/110', illness: 1, docName: '小明', record: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaa', tel: 13032885319 },
+        { id: 110, name: '吴xx', sex: '男', age: 233, idCard: 1111111111, birthday: '2000-01-01', dataTime: this.today, temperature: '36', bloodPressure: '70/110', illness: 1, docName: '小明', record: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaa', tel: 13032885319 },
         { id: 111, name: '吴xx', sex: '男', age: 233, idCard: 1111111111, birthday: '2000-01-01', dataTime: '2018-04-12', temperature: '36', bloodPressure: '70/110', illness: 2, docName: '小明', record: '', tel: 110 },
         { id: 112, name: '吴xx', sex: '男', age: 233, idCard: 1111111111, birthday: '2000-01-01', dataTime: '2018-04-11', temperature: '36', bloodPressure: '70/110', illness: 3, docName: '小明', record: '', tel: 110 },
         { id: 113, name: '吴xx', sex: '男', age: 233, idCard: 1111111111, birthday: '2000-01-01', dataTime: '2018-04-11', temperature: '36', bloodPressure: '70/110', illness: 4, docName: '小明', record: '', tel: 110 },
@@ -276,3 +276,8 @@ export default {
 }
 </style>
 
+<style>
+  .el-input-group__append {
+    padding: 1px 2px;
+  }
+</style>

@@ -63,11 +63,32 @@ export default {
     this.chart.dispose()
     this.chart = null
   },
+  watch: {
+    chartData: {
+      deep: true,
+      handler(val) {
+        this.setOptions(val)
+      }
+    }
+  },
   methods: {
-    setOptions({ date, ganmao, liugan, changyan } = {}) {
+    setOptions(data) {
+      const seriesData = []
+
+      for (let i = 0; i < data.type.length; i++) {
+        seriesData.push({
+          name: data.type[i],
+          smooth: true,
+          type: 'line',
+          data: data[data.name[i]],
+          animationDuration: 2800,
+          animationEasing: 'quadraticOut'
+        })
+      }
+
       this.chart.setOption({
         xAxis: {
-          data: date,
+          data: data.date,
           boundaryGap: false,
           axisTick: {
             show: false
@@ -98,63 +119,10 @@ export default {
           }
         },
         legend: {
-          data: ['感冒', '流感', '肠炎']
+          data: data.type
         },
-        series: [{
-          name: '感冒',
-          itemStyle: {
-            normal: {
-              color: '#FF005A',
-              lineStyle: {
-                color: '#FF005A',
-                width: 2
-              }
-            }
-          },
-          smooth: true,
-          type: 'line',
-          data: ganmao,
-          animationDuration: 2800,
-          animationEasing: 'cubicInOut'
-        },
-        {
-          name: '流感',
-          smooth: true,
-          type: 'line',
-          itemStyle: {
-            normal: {
-              color: '#3888fa',
-              lineStyle: {
-                color: '#3888fa',
-                width: 2
-              },
-              areaStyle: {
-                color: '#f3f8ff'
-              }
-            }
-          },
-          data: liugan,
-          animationDuration: 2800,
-          animationEasing: 'quadraticOut'
-        },
-        {
-          name: '肠炎',
-          itemStyle: {
-            normal: {
-              color: '#675bba',
-              lineStyle: {
-                color: '#675bba',
-                width: 2
-              }
-            }
-          },
-          smooth: true,
-          type: 'line',
-          data: changyan,
-          animationDuration: 2800,
-          animationEasing: 'cubicInOut'
-        }]
-      })
+        series: seriesData
+      }, { notMerge: true })
     },
     initChart() {
       this.chart = echarts.init(this.$el, 'macarons')

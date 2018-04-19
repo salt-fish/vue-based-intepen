@@ -41,14 +41,13 @@ const filters = {
   completed: todos => todos.filter(todo => todo.done)
 }
 const defalutList = [
-  { text: 'star this repository', done: false },
-  { text: 'fork this repository', done: false },
-  { text: 'follow author', done: false },
-  { text: 'vue-element-admin', done: true },
-  { text: 'vue', done: true },
-  { text: 'element-ui', done: true },
-  { text: 'axios', done: true },
-  { text: 'webpack', done: true }
+  { text: '早上6:00 早饭时间', done: false },
+  { text: '早上8:00 巡查时间', done: false },
+  { text: '中午12:00 午饭时间', done: false },
+  { text: '下午18:00 晚饭时间', done: true },
+  { text: '早上提醒老人吃药', done: true },
+  { text: '提醒吴xx运动', done: true },
+  { text: '吴xx腕带电量耗尽', done: true }
 ]
 export default {
   components: { Todo },

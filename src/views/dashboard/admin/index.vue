@@ -17,6 +17,10 @@
       </el-col>
     </el-row>
 
+    <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
+      <line-chart :chart-data="lineChartData"></line-chart>
+    </el-row>
+
     <el-row class="quick-select" :gutter="20">
       <el-col :span="4" v-for="(data, index) in quickData" v-if="index <= 5" :key="index">
         <div style="display: block; vertical-align: middle;">
@@ -26,11 +30,9 @@
       </el-col>
     </el-row>
 
-    <!-- <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
-      <line-chart :chart-data="lineChartData"></line-chart>
-    </el-row>
+    
 
-    <el-row :gutter="32">
+    <!-- <el-row :gutter="32">
       <el-col :xs="24" :sm="24" :lg="8">
         <div class="chart-wrapper">
           <raddar-chart></raddar-chart>
@@ -110,23 +112,42 @@ export default {
 
     BMap
   },
+  created() {
+    this.getPatientStatistics()
+    this.getQuickData()
+    this.getLineChartData()
+  },
   data() {
     return {
-      lineChartData: lineChartData.newVisitis,
-      patientStatistics: [
+      lineChartData: {},
+      patientStatistics: [],
+      quickData: []
+    }
+  },
+  methods: {
+    getPatientStatistics() {
+      this.patientStatistics = [
         { name: '感冒', number: 20 },
         { name: '发烧', number: 12 },
         { name: '心脏病', number: 51 },
         { name: '肠胃炎', number: 2 },
         { name: '流感', number: 1 }
-      ],
-      quickData: [
+      ]
+    },
+    getQuickData() {
+      this.quickData = [
         { name: '吴XX', avatar: require('../../../assets/images/avatar.jpg') },
         { name: '吴XX', avatar: require('../../../assets/images/avatar.jpg') }
       ]
-    }
-  },
-  methods: {
+    },
+    getLineChartData() {
+      this.lineChartData = {
+        date: ['2018-01-15', '2018-01-31', '2018-02-15', '2018-02-28', '2018-03-15', '2018-03-31', '2018-04-15'],
+        ganmao: [2, 5, 10, 25, 4, 0, 7],
+        liugan: [5, 15, 25, 12, 0, 0, 0],
+        changyan: [2, 2, 20, 3, 0, 1, 0]
+      }
+    },
     handleSetLineChartData(type) {
       this.lineChartData = lineChartData[type]
     }
@@ -138,6 +159,7 @@ export default {
 .dashboard-editor-container {
   padding: 32px;
   background-color: rgb(240, 242, 245);
+  min-height: 100vh;
   .chart-wrapper {
     background: #fff;
     padding: 16px 16px 0;

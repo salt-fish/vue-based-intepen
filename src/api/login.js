@@ -1,12 +1,16 @@
 import request from '@/utils/request'
 
 export function loginByUsername(username, password) {
-  const data = {
+  const data = JSON.stringify({
     username,
     password
-  }
+  })
+  // const data = {
+  //   username,
+  //   password
+  // }
   return request({
-    url: '/login/login',
+    url: '/login',
     method: 'post',
     data
   })
@@ -26,4 +30,3 @@ export function getUserInfo(token) {
     params: { token }
   })
 }
-

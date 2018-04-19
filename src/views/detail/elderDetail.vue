@@ -65,6 +65,31 @@
       </el-col>
     </el-row>
 
+    <!-- 个人统计 -->
+    <el-row>
+      <el-col>
+        <el-container>
+          <el-header>
+            个人健康统计
+          </el-header>
+          <el-main>
+            <el-row :gutter="20">
+              <el-col :span="8">
+                <gauge-chart :chartName="elder.dailyStatistic[0].name" :gaugeData="elder.dailyStatistic[0].value" :min="500" :max="3500"></gauge-chart>
+              </el-col>
+              <el-col :span="8">
+                <gauge-chart :chartName="elder.dailyStatistic[1].name" :gaugeData="elder.dailyStatistic[1].value" :min="0" :max="22000"></gauge-chart>
+              </el-col>
+              <el-col :span="8">
+                <gauge-chart :chartName="elder.dailyStatistic[2].name" :gaugeData="elder.dailyStatistic[2].value" :min="1" :max="10"></gauge-chart>
+              </el-col>
+            </el-row>
+          </el-main>
+        </el-container>
+      </el-col>
+    </el-row>
+
+
     <!-- 医嘱 -->
     <el-row>
       <el-col>
@@ -91,7 +116,16 @@
             定位
           </el-header>
           <el-main>
-            <b-map :name="elder.name" :lng="elder.center.lng" :lat="elder.center.lat" :mapType="1"></b-map>
+            <el-row :gutter="32">
+              <el-col :span="14">
+                <b-map :name="elder.name" :lng="elder.center.lng" :lat="elder.center.lat" :mapType="1"></b-map>
+              </el-col>
+              <el-col :span="10">
+                <el-card>
+                  <div v-for="(item, index) in elder.activityData" :key="index">{{ item.time }} &nbsp;&nbsp;&nbsp;&nbsp; {{ item.value }}</div>
+                </el-card>
+              </el-col>
+            </el-row>
           </el-main>
         </el-container>
       </el-col>
@@ -145,10 +179,11 @@
 // import { mapGetters } from 'vuex'
 import BMap from '@/components/BaiduMap'
 import LineChart from './components/lineMarker'
+import gaugeChart from './components/gaugeChart'
 
 export default {
   name: 'elderDetail',
-  components: { BMap, LineChart },
+  components: { BMap, LineChart, gaugeChart },
   data() {
     return {
       markdownFlag: false,
@@ -201,6 +236,21 @@ export default {
           { date: '2018-02-02 5:00', step: 80, heartRate: 85, bloodGlucose: 4.00 },
           { date: '2018-03-02 6:00', step: 200, heartRate: 85, bloodGlucose: 6.00 },
           { date: '2018-04-02 7:00', step: 500, heartRate: 85, bloodGlucose: 5.00 }
+        ],
+        activityData: [
+          { time: '2018-04-13 07:00', value: '吃早饭' },
+          { time: '2018-04-13 10:00', value: '公园散步' },
+          { time: '2018-04-13 12:00', value: '吃午饭' },
+          { time: '2018-04-13 13:30', value: '午休' },
+          { time: '2018-04-13 17:30', value: '吃完饭' },
+          { time: '2018-04-13 19:00', value: '吃药' },
+          { time: '2018-04-13 19:30', value: '跳广场舞' },
+          { time: '2018-04-13 21:30', value: '睡觉' }
+        ],
+        dailyStatistic: [
+          { name: '饮水量', value: 2200 },
+          { name: '运动量', value: 5000 },
+          { name: '睡眠时间', value: 2 }
         ]
       }
     }

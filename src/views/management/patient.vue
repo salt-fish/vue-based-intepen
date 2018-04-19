@@ -59,9 +59,9 @@
       </el-row>
       <el-row :gutter="20">
         <el-col :span="2" :offset="2">生日:</el-col>
-        <el-col :span="6"><el-date-picker style="width: 100%;" size="mini" type="date" v-model="elderData[dialogDataIndex].birthday" placeholder="选择日期"></el-date-picker></el-col>
+        <el-col :span="6"><el-date-picker style="width: 100%;" size="mini" type="date" value-format="yyyy-MM-dd" v-model="elderData[dialogDataIndex].birthday" placeholder="选择日期"></el-date-picker></el-col>
         <el-col :span="4" :offset="0">入院时间:</el-col>
-        <el-col :span="6"><el-date-picker style="width: 100%;" size="mini" type="date" v-model="elderData[dialogDataIndex].inHospital" placeholder="选择日期"></el-date-picker></el-col>
+        <el-col :span="6"><el-date-picker style="width: 100%;" size="mini" type="date" value-format="yyyy-MM-dd" v-model="elderData[dialogDataIndex].inHospital" placeholder="选择日期"></el-date-picker></el-col>
       </el-row>
       <el-row :gutter="20">
         <el-col :span="2" :offset="2">床位:</el-col>
@@ -105,9 +105,9 @@
       </el-row>
       <el-row :gutter="20">
         <el-col :span="2" :offset="2">生日:</el-col>
-        <el-col :span="6"><el-date-picker style="width: 100%;" size="mini" type="date" v-model="newData.birthday" placeholder="选择日期"></el-date-picker></el-col>
+        <el-col :span="6"><el-date-picker style="width: 100%;" size="mini" type="date" value-format="yyyy-MM-dd" v-model="newData.birthday" placeholder="选择日期"></el-date-picker></el-col>
         <el-col :span="4" :offset="0">入院时间:</el-col>
-        <el-col :span="6"><el-date-picker style="width: 100%;" size="mini" type="date" v-model="newData.inHospital" placeholder="选择日期"></el-date-picker></el-col>
+        <el-col :span="6"><el-date-picker style="width: 100%;" size="mini" type="date" value-format="yyyy-MM-dd" v-model="newData.inHospital" placeholder="选择日期"></el-date-picker></el-col>
       </el-row>
       <el-row :gutter="20">
         <el-col :span="2" :offset="2">床位:</el-col>

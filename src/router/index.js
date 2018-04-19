@@ -63,29 +63,29 @@ export default new Router({
 })
 
 export const asyncRouterMap = [
-  {
-    path: '/permission',
-    component: Layout,
-    redirect: '/permission/index',
-    meta: { roles: ['admin'] }, // you can set roles in root nav
-    children: [{
-      path: 'index',
-      component: _import('permission/index'),
-      name: 'permission',
-      meta: {
-        title: '权限测试页',
-        icon: 'lock',
-        roles: ['admin'] // or you can only set roles in sub nav
-      }
-    }]
-  },
+  // {
+  //   path: '/permission',
+  //   component: Layout,
+  //   redirect: '/permission/index',
+  //   meta: { roles: ['admin'] }, // you can set roles in root nav
+  //   children: [{
+  //     path: 'index',
+  //     component: _import('permission/index'),
+  //     name: 'permission',
+  //     meta: {
+  //       title: '权限测试页',
+  //       icon: 'lock',
+  //       roles: ['admin'] // or you can only set roles in sub nav
+  //     }
+  //   }]
+  // },
 
   {
     path: '/userDetail',
     component: Layout,
     redirect: '/userDetail/index', //  /:id
     meta: {
-      roles: ['editor']
+      roles: ['userDetail']
     },
     children: [{
       path: 'index', //  /:id
@@ -107,61 +107,31 @@ export const asyncRouterMap = [
     meta: {
       title: '服务',
       icon: 'component',
-      roles: ['editor']
+      roles: ['service']
     },
     children: [
-      { path: 'chooseNurse', component: _import('services/nurse'), name: 'nurse', meta: { title: '选择护工', roles: ['editor'] }},
-      { path: 'chooseService', component: _import('services/serviceLevel'), name: 'service-level', meta: { title: '选择服务档次', roles: ['editor'] }}
+      { path: 'chooseNurse', component: _import('services/nurse'), name: 'nurse', meta: { title: '选择护工', roles: ['service'] }},
+      { path: 'chooseService', component: _import('services/serviceLevel'), name: 'service-level', meta: { title: '选择服务档次', roles: ['service'] }}
     ]
   },
 
   {
-    path: '/relation',
+    path: '/statistic',
     component: Layout,
-    redirect: '/relation/index',
+    redirect: '/statistic/index',
     meta: {
-      roles: ['admin']
+      roles: ['statistic', 'admin']
     },
     children: [{
       path: 'index',
-      component: _import('relation/index'),
-      name: 'relation',
+      component: _import('statisticChart/index'),
+      name: 'statisticChart',
       meta: {
-        title: '关联家属',
-        icon: 'example',
+        title: '统计信息',
+        icon: 'chart',
         noCache: true
       }
     }]
-  },
-
-  {
-    path: '/management',
-    component: Layout,
-    redirect: 'noredirect',
-    name: 'management',
-    meta: {
-      title: '人员管理',
-      icon: 'component',
-      roles: ['admin', 'nurse']
-    },
-    children: [
-      { path: 'managePatient', component: _import('management/patient'), name: 'patient', meta: { title: '老人管理', roles: ['admin', 'nurse'] }},
-      { path: 'manageNurse', component: _import('management/nurse'), name: 'nurse', meta: { title: '护士管理', roles: ['admin'] }}
-    ]
-  },
-
-  {
-    path: '/detail',
-    component: Layout,
-    hidden: true,
-    redirect: 'noredirect',
-    meta: {
-      roles: ['admin', 'nurse']
-    },
-    children: [
-      { path: 'index_e_:elderId', component: _import('detail/elderDetail'), name: 'elderDetail', meta: { title: '查看老人信息', noCache: true }},
-      { path: 'index_n_:nurseId', component: _import('detail/nurseDetail'), name: 'nurseDetail', meta: { title: '查看护工信息', noCache: true }}
-    ]
   },
 
   {
@@ -169,7 +139,7 @@ export const asyncRouterMap = [
     component: Layout,
     redirect: '/inspection/index',
     meta: {
-      roles: ['admin', 'nurse']
+      roles: ['admin', 'inspection']
     },
     children: [{
       path: 'index',
@@ -184,166 +154,271 @@ export const asyncRouterMap = [
   },
 
   {
+    path: '/management',
+    component: Layout,
+    redirect: 'noredirect',
+    name: 'management',
+    meta: {
+      title: '人员管理',
+      icon: 'component'
+    },
+    children: [
+      { path: 'managePatient', component: _import('management/patient'), name: 'patient', meta: { title: '老人管理', icon: 'component', roles: ['admin', 'elderManagement'] }},
+      { path: 'manageNurse', component: _import('management/nurse'), name: 'nurse', meta: { title: '护士管理', icon: 'component', roles: ['admin', 'nurseManagement'] }}
+    ]
+  },
+
+  {
+    path: '/detail',
+    component: Layout,
+    hidden: true,
+    redirect: 'noredirect',
+    meta: {
+      roles: ['admin', 'detail']
+    },
+    children: [
+      { path: 'index_e_:elderId', component: _import('detail/elderDetail'), name: 'elderDetail', meta: { title: '查看老人信息', noCache: true }},
+      { path: 'index_n_:nurseId', component: _import('detail/nurseDetail'), name: 'nurseDetail', meta: { title: '查看护工信息', noCache: true }}
+    ]
+  },
+
+  {
     path: '/documentation',
     component: Layout,
     redirect: 'noredirect',
     name: 'documentation',
     meta: {
       title: '健康管理',
-      icon: 'documentation',
-      roles: ['admin', 'nurse']
+      icon: 'documentation'
     },
     children: [
-      { path: 'medicallyExamin', component: _import('documentation/medicallyExamination'), name: 'medicallyExamination', meta: { title: '体检记录', roles: ['admin', 'nurse'] }},
-      { path: 'advice', component: _import('documentation/advice'), name: 'advice', meta: { title: '医嘱', roles: ['admin', 'nurse'] }},
-      { path: 'medicalRecord', component: _import('documentation/medicalRecord'), name: 'medicalRecord', meta: { title: '病历', roles: ['admin', 'nurse'] }}
+      { path: 'medicallyExamin', component: _import('documentation/medicallyExamination'), name: 'medicallyExamination', meta: { title: '体检记录', roles: ['admin', 'documentation'] }},
+      { path: 'advice', component: _import('documentation/advice'), name: 'advice', meta: { title: '医嘱', roles: ['admin', 'documentation'] }},
+      { path: 'medicalRecord', component: _import('documentation/medicalRecord'), name: 'medicalRecord', meta: { title: '病历', roles: ['admin', 'documentation'] }}
     ]
   },
 
   {
-    path: '/icon',
+    path: '/relation',
     component: Layout,
+    redirect: '/relation/index',
+    meta: {
+      roles: ['admin', 'relation']
+    },
     children: [{
       path: 'index',
-      component: _import('svg-icons/index'),
-      name: 'icons',
-      meta: { title: '图标', icon: 'icon', noCache: true }
+      component: _import('relation/index'),
+      name: 'relation',
+      meta: {
+        title: '关联家属',
+        icon: 'example',
+        noCache: true
+      }
     }]
   },
 
   {
-    path: '/components',
+    path: '/notification',
     component: Layout,
-    redirect: 'noredirect',
-    name: 'component-demo',
+    redirect: '/notification/index',
     meta: {
-      title: '组件',
-      icon: 'component'
+      roles: ['admin', 'notification']
     },
-    children: [
-      { path: 'tinymce', component: _import('components-demo/tinymce'), name: 'tinymce-demo', meta: { title: '富文本编辑器' }},
-      { path: 'markdown', component: _import('components-demo/markdown'), name: 'markdown-demo', meta: { title: 'Markdown' }},
-      { path: 'json-editor', component: _import('components-demo/jsonEditor'), name: 'jsonEditor-demo', meta: { title: 'JSON编辑器' }},
-      { path: 'dnd-list', component: _import('components-demo/dndList'), name: 'dndList-demo', meta: { title: '列表拖拽' }},
-      { path: 'splitpane', component: _import('components-demo/splitpane'), name: 'splitpane-demo', meta: { title: 'Splitpane' }},
-      { path: 'avatar-upload', component: _import('components-demo/avatarUpload'), name: 'avatarUpload-demo', meta: { title: '头像上传' }},
-      { path: 'dropzone', component: _import('components-demo/dropzone'), name: 'dropzone-demo', meta: { title: 'Dropzone' }},
-      { path: 'sticky', component: _import('components-demo/sticky'), name: 'sticky-demo', meta: { title: 'Sticky' }},
-      { path: 'count-to', component: _import('components-demo/countTo'), name: 'countTo-demo', meta: { title: 'CountTo' }},
-      { path: 'mixin', component: _import('components-demo/mixin'), name: 'componentMixin-demo', meta: { title: '小组件' }},
-      { path: 'back-to-top', component: _import('components-demo/backToTop'), name: 'backToTop-demo', meta: { title: '返回顶部' }}
-    ]
+    children: [{
+      path: 'index',
+      component: _import('notification/index'),
+      name: 'notification',
+      meta: {
+        title: '通知列表',
+        icon: 'notification',
+        noCache: true
+      }
+    }]
   },
 
   {
-    path: '/charts',
+    path: '/permission',
     component: Layout,
-    redirect: 'noredirect',
-    name: 'charts',
+    redirect: '/[permission/index',
+    name: 'permission',
     meta: {
-      title: '图表',
-      icon: 'chart'
+      roles: ['admin', 'permission']
     },
-    children: [
-      { path: 'keyboard', component: _import('charts/keyboard'), name: 'keyboardChart', meta: { title: '键盘图表', noCache: true }},
-      { path: 'line', component: _import('charts/line'), name: 'lineChart', meta: { title: '折线图', noCache: true }},
-      { path: 'mixchart', component: _import('charts/mixChart'), name: 'mixChart', meta: { title: '混合图表', noCache: true }}
-    ]
+    children: [{
+      path: 'index',
+      component: _import('permission/index'),
+      name: 'permission',
+      meta: {
+        title: '权限管理',
+        icon: 'lock',
+        noCache: true
+      }
+    }]
   },
 
   {
-    path: '/example',
+    path: '/settings',
     component: Layout,
-    redirect: '/example/table/complex-table',
-    name: 'example',
+    redirect: '/settings/index',
     meta: {
-      title: '综合实例',
-      icon: 'example'
+      roles: ['admin', 'settings']
     },
-    children: [
-      {
-        path: '/example/table',
-        component: _import('example/table/index'),
-        redirect: '/example/table/complex-table',
-        name: 'Table',
-        meta: {
-          title: 'Table',
-          icon: 'table'
-        },
-        children: [
-          { path: 'dynamic-table', component: _import('example/table/dynamicTable/index'), name: 'dynamicTable', meta: { title: '动态Table' }},
-          { path: 'drag-table', component: _import('example/table/dragTable'), name: 'dragTable', meta: { title: '拖拽Table' }},
-          { path: 'inline-edit-table', component: _import('example/table/inlineEditTable'), name: 'inlineEditTable', meta: { title: 'Table内编辑' }},
-          { path: 'tree-table', component: _import('example/table/treeTable/treeTable'), name: 'treeTableDemo', meta: { title: '树形表格' }},
-          { path: 'custom-tree-table', component: _import('example/table/treeTable/customTreeTable'), name: 'customTreeTableDemo', meta: { title: '自定义树表' }},
-          { path: 'complex-table', component: _import('example/table/complexTable'), name: 'complexTable', meta: { title: '综合Table' }}
-        ]
-      },
-      { path: 'tab/index', icon: 'tab', component: _import('example/tab/index'), name: 'tab', meta: { title: 'Tab' }}
-    ]
+    children: [{
+      path: 'index',
+      component: _import('settings/index'),
+      name: 'settings',
+      meta: {
+        title: '设置',
+        icon: 'settings',
+        noCache: true
+      }
+    }]
   },
 
-  {
-    path: '/form',
-    component: Layout,
-    redirect: 'noredirect',
-    name: 'form',
-    meta: {
-      title: '表单',
-      icon: 'form'
-    },
-    children: [
-      { path: 'create-form', component: _import('form/create'), name: 'createForm', meta: { title: '创建表单', icon: 'table' }},
-      { path: 'edit-form', component: _import('form/edit'), name: 'editForm', meta: { title: '编辑表单', icon: 'table' }}
-    ]
-  },
+  // {
+  //   path: '/icon',
+  //   component: Layout,
+  //   children: [{
+  //     path: 'index',
+  //     component: _import('svg-icons/index'),
+  //     name: 'icons',
+  //     meta: { title: '图标', icon: 'icon', noCache: true }
+  //   }]
+  // },
 
-  {
-    path: '/error',
-    component: Layout,
-    redirect: 'noredirect',
-    name: 'errorPages',
-    meta: {
-      title: '错误页面',
-      icon: '404'
-    },
-    children: [
-      { path: '401', component: _import('errorPage/401'), name: 'page401', meta: { title: '401', noCache: true }},
-      { path: '404', component: _import('errorPage/404'), name: 'page404', meta: { title: '404', noCache: true }}
-    ]
-  },
+  // {
+  //   path: '/components',
+  //   component: Layout,
+  //   redirect: 'noredirect',
+  //   name: 'component-demo',
+  //   meta: {
+  //     title: '组件',
+  //     icon: 'component'
+  //   },
+  //   children: [
+  //     { path: 'tinymce', component: _import('components-demo/tinymce'), name: 'tinymce-demo', meta: { title: '富文本编辑器' }},
+  //     { path: 'markdown', component: _import('components-demo/markdown'), name: 'markdown-demo', meta: { title: 'Markdown' }},
+  //     { path: 'json-editor', component: _import('components-demo/jsonEditor'), name: 'jsonEditor-demo', meta: { title: 'JSON编辑器' }},
+  //     { path: 'dnd-list', component: _import('components-demo/dndList'), name: 'dndList-demo', meta: { title: '列表拖拽' }},
+  //     { path: 'splitpane', component: _import('components-demo/splitpane'), name: 'splitpane-demo', meta: { title: 'Splitpane' }},
+  //     { path: 'avatar-upload', component: _import('components-demo/avatarUpload'), name: 'avatarUpload-demo', meta: { title: '头像上传' }},
+  //     { path: 'dropzone', component: _import('components-demo/dropzone'), name: 'dropzone-demo', meta: { title: 'Dropzone' }},
+  //     { path: 'sticky', component: _import('components-demo/sticky'), name: 'sticky-demo', meta: { title: 'Sticky' }},
+  //     { path: 'count-to', component: _import('components-demo/countTo'), name: 'countTo-demo', meta: { title: 'CountTo' }},
+  //     { path: 'mixin', component: _import('components-demo/mixin'), name: 'componentMixin-demo', meta: { title: '小组件' }},
+  //     { path: 'back-to-top', component: _import('components-demo/backToTop'), name: 'backToTop-demo', meta: { title: '返回顶部' }}
+  //   ]
+  // },
 
-  {
-    path: '/error-log',
-    component: Layout,
-    redirect: 'noredirect',
-    children: [{ path: 'log', component: _import('errorLog/index'), name: 'errorLog', meta: { title: '错误日志', icon: 'bug' }}]
-  },
+  // {
+  //   path: '/charts',
+  //   component: Layout,
+  //   redirect: 'noredirect',
+  //   name: 'charts',
+  //   meta: {
+  //     title: '图表',
+  //     icon: 'chart'
+  //   },
+  //   children: [
+  //     { path: 'keyboard', component: _import('charts/keyboard'), name: 'keyboardChart', meta: { title: '键盘图表', noCache: true }},
+  //     { path: 'line', component: _import('charts/line'), name: 'lineChart', meta: { title: '折线图', noCache: true }},
+  //     { path: 'mixchart', component: _import('charts/mixChart'), name: 'mixChart', meta: { title: '混合图表', noCache: true }}
+  //   ]
+  // },
 
-  {
-    path: '/excel',
-    component: Layout,
-    redirect: '/excel/export-excel',
-    name: 'excel',
-    meta: {
-      title: 'Excel',
-      icon: 'excel'
-    },
-    children: [
-      { path: 'export-excel', component: _import('excel/exportExcel'), name: 'exportExcel', meta: { title: 'Export Excel' }},
-      { path: 'export-selected-excel', component: _import('excel/selectExcel'), name: 'selectExcel', meta: { title: 'Export Selected' }},
-      { path: 'upload-excel', component: _import('excel/uploadExcel'), name: 'uploadExcel', meta: { title: 'Upload Excel' }}
-    ]
-  },
+  // {
+  //   path: '/example',
+  //   component: Layout,
+  //   redirect: '/example/table/complex-table',
+  //   name: 'example',
+  //   meta: {
+  //     title: '综合实例',
+  //     icon: 'example'
+  //   },
+  //   children: [
+  //     {
+  //       path: '/example/table',
+  //       component: _import('example/table/index'),
+  //       redirect: '/example/table/complex-table',
+  //       name: 'Table',
+  //       meta: {
+  //         title: 'Table',
+  //         icon: 'table'
+  //       },
+  //       children: [
+  //         { path: 'dynamic-table', component: _import('example/table/dynamicTable/index'), name: 'dynamicTable', meta: { title: '动态Table' }},
+  //         { path: 'drag-table', component: _import('example/table/dragTable'), name: 'dragTable', meta: { title: '拖拽Table' }},
+  //         { path: 'inline-edit-table', component: _import('example/table/inlineEditTable'), name: 'inlineEditTable', meta: { title: 'Table内编辑' }},
+  //         { path: 'tree-table', component: _import('example/table/treeTable/treeTable'), name: 'treeTableDemo', meta: { title: '树形表格' }},
+  //         { path: 'custom-tree-table', component: _import('example/table/treeTable/customTreeTable'), name: 'customTreeTableDemo', meta: { title: '自定义树表' }},
+  //         { path: 'complex-table', component: _import('example/table/complexTable'), name: 'complexTable', meta: { title: '综合Table' }}
+  //       ]
+  //     },
+  //     { path: 'tab/index', icon: 'tab', component: _import('example/tab/index'), name: 'tab', meta: { title: 'Tab' }}
+  //   ]
+  // },
 
-  {
-    path: '/zip',
-    component: Layout,
-    redirect: '/zip/download',
-    alwaysShow: true,
-    meta: { title: 'Zip', icon: 'zip' },
-    children: [{ path: 'download', component: _import('zip/index'), name: 'exportZip', meta: { title: 'Export Zip' }}]
-  },
+  // {
+  //   path: '/form',
+  //   component: Layout,
+  //   redirect: 'noredirect',
+  //   name: 'form',
+  //   meta: {
+  //     title: '表单',
+  //     icon: 'form'
+  //   },
+  //   children: [
+  //     { path: 'create-form', component: _import('form/create'), name: 'createForm', meta: { title: '创建表单', icon: 'table' }},
+  //     { path: 'edit-form', component: _import('form/edit'), name: 'editForm', meta: { title: '编辑表单', icon: 'table' }}
+  //   ]
+  // },
+
+  // {
+  //   path: '/error',
+  //   component: Layout,
+  //   redirect: 'noredirect',
+  //   name: 'errorPages',
+  //   meta: {
+  //     title: '错误页面',
+  //     icon: '404'
+  //   },
+  //   children: [
+  //     { path: '401', component: _import('errorPage/401'), name: 'page401', meta: { title: '401', noCache: true }},
+  //     { path: '404', component: _import('errorPage/404'), name: 'page404', meta: { title: '404', noCache: true }}
+  //   ]
+  // },
+
+  // {
+  //   path: '/error-log',
+  //   component: Layout,
+  //   redirect: 'noredirect',
+  //   children: [{ path: 'log', component: _import('errorLog/index'), name: 'errorLog', meta: { title: '错误日志', icon: 'bug' }}]
+  // },
+
+  // {
+  //   path: '/excel',
+  //   component: Layout,
+  //   redirect: '/excel/export-excel',
+  //   name: 'excel',
+  //   meta: {
+  //     title: 'Excel',
+  //     icon: 'excel'
+  //   },
+  //   children: [
+  //     { path: 'export-excel', component: _import('excel/exportExcel'), name: 'exportExcel', meta: { title: 'Export Excel' }},
+  //     { path: 'export-selected-excel', component: _import('excel/selectExcel'), name: 'selectExcel', meta: { title: 'Export Selected' }},
+  //     { path: 'upload-excel', component: _import('excel/uploadExcel'), name: 'uploadExcel', meta: { title: 'Upload Excel' }}
+  //   ]
+  // },
+
+  // {
+  //   path: '/zip',
+  //   component: Layout,
+  //   redirect: '/zip/download',
+  //   alwaysShow: true,
+  //   meta: { title: 'Zip', icon: 'zip' },
+  //   children: [{ path: 'download', component: _import('zip/index'), name: 'exportZip', meta: { title: 'Export Zip' }}]
+  // },
 
   // {
   //   path: '/theme',
