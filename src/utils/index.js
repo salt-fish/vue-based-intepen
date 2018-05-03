@@ -277,3 +277,82 @@ export function deepClone(source) {
   })
   return targetObj
 }
+
+// 比较数组
+// Warn if overriding existing method
+if (Array.prototype.equals) {
+  console.warn("Overriding existing Array.prototype.equals. Possible causes: New API defines the method, there's a framework conflict or you've got double inclusions in your code.")
+}
+// attach the .equals method to Array's prototype to call it on any array
+Array.prototype.equals = function(array) {
+  // if the other array is a falsy value, return
+  if (!array) {
+    return false
+  }
+
+  // compare lengths - can save a lot of time
+  if (this.length !== array.length) {
+    return false
+  }
+
+  for (var i = 0, l = this.length; i < l; i++) {
+    // Check if we have nested arrays
+    if (this[i] instanceof Array && array[i] instanceof Array) {
+      // recurse into the nested arrays
+      if (!this[i].equals(array[i])) {
+        return false
+      }
+    } else if (this[i] !== array[i]) {
+      // Warning - two different object instances will never be equal: {x:20} != {x:20}
+      return false
+    }
+  }
+  return true
+}
+// Hide method from for-in loops
+Object.defineProperty(Array.prototype, 'equals', { enumerable: false })
+
+// 比较对象
+export function isObjectEqual(x, y) {
+// If both x and y are null or undefined and exactly the same
+  if (x === y) {
+    return true
+  }
+  // If they are not strictly equal, they both need to be Objects
+  if (!(x instanceof Object) || !(y instanceof Object)) {
+    return false
+  }
+  // They must have the exact same prototype chain,the closest we can do is
+  // test the constructor.
+  if (x.constructor !== y.constructor) {
+    return false
+  }
+  for (var p in x) {
+    // Inherited properties were tested using x.constructor === y.constructor
+    if (x.hasOwnProperty(p)) {
+      // Allows comparing x[ p ] and y[ p ] when set to undefined
+      if (!y.hasOwnProperty(p)) {
+        return false
+      }
+      // If they have the same strict value or identity then they are equal
+      if (x[p] === y[p]) {
+        continue
+      }
+      // Numbers, Strings, Functions, Booleans must be strictly equal
+      if (typeof x[p] !== 'object') {
+        return false
+      }
+      // Objects and Arrays must be tested recursively
+      if (!Object.equals(x[p], y[p])) {
+        return false
+      }
+    }
+  }
+  for (p in y) {
+    // allows x[ p ] to be set to undefined
+    if (y.hasOwnProperty(p) && !x.hasOwnProperty(p)) {
+      return false
+    }
+  }
+  return true
+}

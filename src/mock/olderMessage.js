@@ -1,3 +1,4 @@
+import { isObjectEqual } from '@/utils'
 
 const olderMap = {
   older1: {
@@ -22,8 +23,33 @@ const olderMap = {
   }
 }
 
+const notifications = [
+  { id: 1, time: '2018-04-15 10:00', data: '吴xx老人摔倒', flag: 2 }, // flag: 消息状态 1.一般消息 2.紧急消息 0.已完成
+  { id: 2, time: '2018-04-15 10:20', data: 'xx老人摔倒', flag: 2 },
+  { id: 3, time: '2018-04-15 12:00', data: '午餐时间', flag: 1 },
+  { id: 4, time: '2018-04-15 13:00', data: '午休时间', flag: 1 },
+  { id: 5, time: '2018-04-15 13:00', data: '午休时间', flag: 0 }
+]
+
 export default{
   getOlderInfo: config => {
     return olderMap
+  },
+  getNotification: config => {
+    return notifications
+  },
+  deleteNotification: config => {
+    const index = notifications.findIndex(v => {
+      return isObjectEqual(v, JSON.parse(config.body))
+    })
+    console.log(config.body)
+    console.log(index)
+    notifications[index].flag = 0
+    notifications.splice(index, 1)
+    return notifications
+  },
+  addNotification: config => {
+    notifications.push(JSON.parse(config))
+    return notifications
   }
 }

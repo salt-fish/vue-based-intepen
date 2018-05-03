@@ -20,7 +20,7 @@
       <el-table-column header-align="center" width="100" label="入院时间" prop="inHospital"></el-table-column>
       <el-table-column header-align="center" width="80" label="主治医师" prop="docName"></el-table-column>
       <el-table-column header-align="center" label="床位" prop="bed"></el-table-column>
-      <el-table-column header-align="center" label="操作" :width="roles[0] === 'admin' ? '250' : '150'" align="center">
+      <el-table-column header-align="center" label="操作" :width="roles.includes('admin') ? '250' : '150'" align="center">
         <template slot-scope="scope">
           <el-popover ref="refuse" placement="top-start" width="160" v-model="scope.row.visible">
             <p>确定要删除这位老人吗?</p>
@@ -30,8 +30,8 @@
             </div>
           </el-popover>  
           <el-button size="mini" @click="retrieveElder(scope.$index)">查看</el-button>
-          <el-button v-if="roles[0] === 'admin'" size="mini" @click="eidtDialog(scope.$index)">编辑</el-button>
-          <el-button v-if="roles[0] === 'admin'" size="mini" v-popover:refuse>删除</el-button>
+          <el-button v-if="roles.includes('admin')" size="mini" @click="eidtDialog(scope.$index)">编辑</el-button>
+          <el-button v-if="roles.includes('admin')" size="mini" v-popover:refuse>删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -134,6 +134,7 @@
 // import
 import { mapGetters } from 'vuex'
 import { deepClone, objectMerge } from '@/utils'
+import { getElder, addElder, editElder, deleteElder } from '@/api/older'
 
 export default {
   data() {
@@ -162,18 +163,39 @@ export default {
       newDialogVisibel: false
     }
   },
-  created() {
-    this.getElderList()
+  beforeCreate() {
+    // this.getElderList()
+    this.$nextTick(() => {
+      this.getElderList()
+    })
+  },
+  mounted() {
+    // this.$nextTick(() => {
+    //   this.getElderList()
+    // })
+    console.log('mounted', this.elderData)
   },
   methods: {
     getElderList() {
-      this.elderData = [
-        { id: 110, name: '吴xx', sex: '男', age: 233, idCard: 610302000000000000, birthday: '2000-01-01', inHospital: '2017-10-01', bed: '2楼222室2床', docName: '小明', tel: 13032885319, avatar: require('../../assets/images/avatar.jpg'), visible: false },
-        { id: 111, name: '吴xx', sex: '男', age: 233, idCard: 1111111111, birthday: '2000-01-01', inHospital: '2017-10-01', bed: '2楼222室2床', docName: '小明', tel: 13032885319, avatar: require('../../assets/images/avatar.jpg'), visible: false },
-        { id: 112, name: '吴xx', sex: '男', age: 233, idCard: 1111111111, birthday: '2000-01-01', inHospital: '2017-10-01', bed: '2楼222室2床', docName: '小明', tel: 13032885319, avatar: require('../../assets/images/avatar.jpg'), visible: false },
-        { id: 113, name: '吴xx', sex: '男', age: 233, idCard: 1111111111, birthday: '2000-01-01', inHospital: '2017-10-01', bed: '2楼222室2床', docName: '小明', tel: 13032885319, avatar: require('../../assets/images/avatar.jpg'), visible: false },
-        { id: 114, name: '吴xx', sex: '男', age: 233, idCard: 1111111111, birthday: '2000-01-01', inHospital: '2017-10-01', bed: '2楼222室2床', docName: '小明', tel: 13032885319, avatar: require('../../assets/images/avatar.jpg'), visible: false }
-      ]
+      getElder().then(res => {
+        if (res.data.code !== 0) {
+          this.$message.error('列表初始化失败')
+        }
+        console.log('in')
+        console.log(res.data.data)
+        this.elderData = res.data.data
+      }).catch(error => {
+        console.log(error)
+        this.$message.error('列表初始化失败')
+      })
+      // this.elderData = [
+      //   { id: 110, name: '吴xx', sex: '男', age: 233, idCard: 610302000000000000, birthday: '2000-01-01', inHospital: '2017-10-01', bed: '2楼222室2床', docName: '小明', tel: 13032885319, avatar: require('../../assets/images/avatar.jpg'), visible: false },
+      //   { id: 111, name: '吴xx', sex: '男', age: 233, idCard: 1111111111, birthday: '2000-01-01', inHospital: '2017-10-01', bed: '2楼222室2床', docName: '小明', tel: 13032885319, avatar: require('../../assets/images/avatar.jpg'), visible: false },
+      //   { id: 112, name: '吴xx', sex: '男', age: 233, idCard: 1111111111, birthday: '2000-01-01', inHospital: '2017-10-01', bed: '2楼222室2床', docName: '小明', tel: 13032885319, avatar: require('../../assets/images/avatar.jpg'), visible: false },
+      //   { id: 113, name: '吴xx', sex: '男', age: 233, idCard: 1111111111, birthday: '2000-01-01', inHospital: '2017-10-01', bed: '2楼222室2床', docName: '小明', tel: 13032885319, avatar: require('../../assets/images/avatar.jpg'), visible: false },
+      //   { id: 114, name: '吴xx', sex: '男', age: 233, idCard: 1111111111, birthday: '2000-01-01', inHospital: '2017-10-01', bed: '2楼222室2床', docName: '小明', tel: 13032885319, avatar: require('../../assets/images/avatar.jpg'), visible: false }
+      // ]
+      setTimeout(() => {console.log('1',this.elderData)}, 1000)
     },
     retrieveElder(index) {
       // params: { markDoneType, id }
@@ -189,17 +211,41 @@ export default {
         this.newDialogVisibel = false
         console.log('new')
         console.log(this.newData)
+        addElder(this.newData).then(res => {
+          if (res.data.code !== 0) {
+            this.$message.error('添加失败')
+          }
+        }).catch(error => {
+          console.log(error)
+          this.$message.error('添加失败')
+        })
         this.newData = deepClone(this.originData)
       } else {
         // edit
         const tmp = this.elderData[this.dialogDataIndex]
         console.log('update:')
         console.log(tmp)
+        editElder(this.newData).then(res => {
+          if (res.data.code !== 0) {
+            this.$message.error('修改失败')
+          }
+        }).catch(error => {
+          console.log(error)
+          this.$message.error('修改失败')
+        })
         this.editDialogVisibel = false
       }
     },
     deleteElder(index) {
       // ajax deleteNurse(this.data[dataIndex].id)
+      deleteElder(this.data[index].id).then(res => {
+        if (res.data.code !== 0) {
+          this.$message.error('删除失败')
+        }
+      }).catch(error => {
+        console.log(error)
+        this.$message.error('删除失败')
+      })
       console.log(this.elderData)
     },
     cancel() {

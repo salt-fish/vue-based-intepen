@@ -37,11 +37,12 @@
 
 <script>
 import { deepClone } from '@/utils'
+import { mapGetters } from 'vuex'
 
 export default {
   data() {
     return {
-      notifications: [],
+      // notifications: [],
       pickerOption: {
         disabledDate(time) {
           return time.getTime() < Date.now()
@@ -57,18 +58,23 @@ export default {
     }
   },
   mounted() {
-    this.getData()
+    // this.getData()
+  },
+  computed: {
+    ...mapGetters([
+      'notifications'
+    ])
   },
   methods: {
-    getData() {
-      this.notifications = [
-        { id: 1, time: '2018-04-15 10:00', data: '吴xx老人摔倒', flag: 2 }, // flag: 消息状态 1.一般消息 2.紧急消息 0.已完成
-        { id: 2, time: '2018-04-15 10:20', data: 'xx老人摔倒', flag: 0 },
-        { id: 3, time: '2018-04-15 12:00', data: '午餐时间', flag: 1 },
-        { id: 4, time: '2018-04-15 13:00', data: '午休时间', flag: 1 },
-        { id: 5, time: '2018-04-15 13:00', data: '午休时间', flag: 0 }
-      ]
-    },
+    // getData() {
+    //   this.notifications = [
+    //     { id: 1, time: '2018-04-15 10:00', data: '吴xx老人摔倒', flag: 2 }, // flag: 消息状态 1.一般消息 2.紧急消息 0.已完成
+    //     { id: 2, time: '2018-04-15 10:20', data: 'xx老人摔倒', flag: 0 },
+    //     { id: 3, time: '2018-04-15 12:00', data: '午餐时间', flag: 1 },
+    //     { id: 4, time: '2018-04-15 13:00', data: '午休时间', flag: 1 },
+    //     { id: 5, time: '2018-04-15 13:00', data: '午休时间', flag: 0 }
+    //   ]
+    // },
     newDialog() {
       this.newDialogVisibel = true
       this.originData = deepClone(this.newData)

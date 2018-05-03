@@ -59,8 +59,8 @@ export default {
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '1111111'
+        username: '12345678901',
+        password: 'password'
       },
       loginRules: {
         // username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -88,6 +88,7 @@ export default {
             this.$router.push({ path: '/' })
           }).catch(() => {
             this.loading = false
+            this.$message.error('用户名或密码错误')
           })
         } else {
           console.log('error submit!!')

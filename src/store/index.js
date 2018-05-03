@@ -7,6 +7,8 @@ import tagsView from './modules/tagsView'
 import user from './modules/user'
 import getters from './getters'
 
+import notification from './modules/notification'
+
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
@@ -15,7 +17,9 @@ const store = new Vuex.Store({
     errorLog,
     permission,
     tagsView,
-    user
+    user,
+
+    notification
   },
   getters
 })

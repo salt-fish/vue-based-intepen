@@ -35,9 +35,12 @@
     </el-table>
 
     <el-dialog class="dialog" :title="userList[dialogDataIndex].name" center :visible.sync="editDialogVisibel">
-      <el-form :inline="true" :model="userList[dialogDataIndex]" style="text-align: center;">
+      <el-form :inline="true" :model="userList[dialogDataIndex]" style="left: 5%; position: relative;">
         <el-form-item label="用户名称">
           <el-input v-model="userList[dialogDataIndex].name" size="mini" :readonly="true"></el-input>
+        </el-form-item>
+        <el-form-item label="用户密码">
+          <el-input v-model="userList[dialogDataIndex].password" size="mini"></el-input>
         </el-form-item>
         <el-form-item label="用户电话">
           <el-input v-model="userList[dialogDataIndex].tel" size="mini" placeholder="用户电话"></el-input>
@@ -53,9 +56,12 @@
     </el-dialog>
 
     <el-dialog class="dialog" title="新增用户" center :visible.sync="newDialogVisibel">
-      <el-form :inline="true" :model="newData" style="text-align: center;">
+      <el-form :inline="true" :model="newData" style="left: 5%; position: relative;">
         <el-form-item label="用户名称">
           <el-input v-model="newData.name" size="mini" placeholder="用户姓名"></el-input>
+        </el-form-item>
+        <el-form-item label="用户密码">
+          <el-input v-model="newData.password" size="mini" placeholder="用户密码"></el-input>
         </el-form-item>
         <el-form-item label="用户电话">
           <el-input v-model="newData.tel" size="mini" placeholder="用户电话"></el-input>
@@ -89,6 +95,7 @@ export default{
       originData: {},
       newData: {
         name: '',
+        password: '',
         tel: 0,
         hasAuth: []
       },
@@ -104,8 +111,8 @@ export default{
   methods: {
     getUserList() {
       this.userList = [
-        { id: 1, name: '小明', tel: 110, hasAuth: [1, 2, 3, 4] },
-        { id: 2, name: '小红', tel: 13030000000, hasAuth: [3, 4] }
+        { id: 1, name: '小明', password: 'a12345', tel: 110, hasAuth: [1, 2, 3, 4] },
+        { id: 2, name: '小红', password: 'a12345', tel: 13030000000, hasAuth: [3, 4] }
       ]
     },
     getAuthList() {

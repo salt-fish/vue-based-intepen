@@ -29,5 +29,8 @@ Mock.mock(/\/transaction\/list/, 'get', transactionAPI.getList)
 
 // 老人信息相关
 Mock.mock(/\/older\/info\.*/, 'get', olderMessageAPI.getOlderInfo)
+Mock.mock(/\/getNotification/, 'get', olderMessageAPI.getNotification)
+Mock.mock(/\/addNotification/, 'post', olderMessageAPI.addNotification)
+Mock.mock(/\/deleteNotification/, 'post', olderMessageAPI.deleteNotification)
 
 export default Mock

@@ -52,11 +52,13 @@ const user = {
         loginByUsername(username, userInfo.password).then(response => {
           console.log(response)
           // const data = response.data
-          const data = JSON.parse(response.data)
+          const data = response.data.data
+          console.log(data.token)
           commit('SET_TOKEN', data.token)
-          setToken(response.data.token)
+          setToken(data.token)
           resolve()
         }).catch(error => {
+          console.log(error)
           reject(error)
         })
       })
@@ -69,7 +71,7 @@ const user = {
           if (!response.data) { // 由于mockjs 不支持自定义状态码只能这样hack
             reject('error')
           }
-          const data = response.data
+          const data = response.data.data
           commit('SET_ROLES', data.roles)
           commit('SET_NAME', data.name)
           commit('SET_AVATAR', data.avatar)
