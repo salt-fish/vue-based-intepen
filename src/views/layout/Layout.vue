@@ -32,12 +32,12 @@ export default {
   created() {
     if (this.roles.includes('admin') || this.roles.includes('notification')) {
       if (this.interval === '') {
-        // this.interval = setInterval(this.initNotifications, 10000)
+        this.interval = setInterval(this.initNotifications, 10000)
         this.initNotifications()
       }
 
       if (this.notice === '') {
-        // this.notice = setInterval(this.showNotifications, 1000)
+        this.notice = setInterval(this.showNotifications, 1000)
         this.showNotifications()
       }
     }
@@ -61,20 +61,19 @@ export default {
     },
     showNotifications() {
       this.notifications.filter(v => {
-        if (v.flag === 2 && !JSON.stringify(this.list).includes(JSON.stringify(v))) {
+        if (v.priority === 9 && v.status !== 1 && !JSON.stringify(this.list).includes(JSON.stringify(v))) {
           this.list.push(v)
           setTimeout(() => {
             this.$notify({
-              title: v.time,
-              message: v.data,
+              title: v.timestamp,
+              message: v.eventName,
               type: 'error',
               duration: 0,
               onClose: () => {
-                console.log(v)
-                this.$store.dispatch('DeleteNotification', v).then(res => {
-                  console.log(res)
-                }).catch(() => {
+                this.$store.dispatch('DeleteNotification', v.id).then(res => {
+                }).catch((error) => {
                   console.log('删除失败')
+                  console.log(error)
                 })
               }
             })

@@ -2,19 +2,19 @@
   <section class="todoapp">
     <!-- header -->
     <header class="header">
-      <input class="new-todo" autocomplete="off" placeholder="Todo List" @keyup.enter="addTodo">
+      <input class="new-todo" autocomplete="off" placeholder="Todo List">
     </header>
     <!-- main section -->
-    <section class="main" v-show="todos.length">
-      <input class="toggle-all" id="toggle-all" type="checkbox" :checked="allChecked" @change="toggleAll({ done: !allChecked })">
-      <label for="toggle-all"></label>
+    <section class="main" v-show="notifications.length">
+      <!-- <input class="toggle-all" id="toggle-all" type="checkbox" :checked="allChecked" @change=" ({ done: !allChecked })">
+      <label for="toggle-all"></label> -->
       <ul class="todo-list">
-        <todo @toggleTodo='toggleTodo' @editTodo='editTodo' @deleteTodo='deleteTodo' v-for="(todo, index) in filteredTodos" v-show="index <= 3" :key="index"
+        <todo @toggleTodo='toggleTodo' @deleteTodo='deleteTodo' v-for="(todo, index) in filteredTodos" v-show="index <= 5" :key="index"
           :todo="todo"></todo>
       </ul>
     </section>
     <!-- footer -->
-    <footer class="footer" v-show="todos.length">
+    <!-- <footer class="footer" v-show="notifications.length">
       <span class="todo-count">
         <strong>{{ remaining }}</strong>
         {{ remaining | pluralize('item') }} left
@@ -24,50 +24,45 @@
           <a :class="{ selected: visibility === key }" @click.prevent="visibility = key">{{ key | capitalize }}</a>
         </li>
       </ul>
-      <!-- <button class="clear-completed" v-show="todos.length > remaining" @click="clearCompleted">
+      <button class="clear-completed" v-show="notifications.length > remaining" @click="clearCompleted">
         Clear completed
-      </button> -->
-    </footer>
+      </button>
+    </footer> -->
   </section>
 </template>
 
 <script>
 import Todo from './Todo.vue'
+import { mapGetters } from 'vuex'
 
 const STORAGE_KEY = 'todos'
 const filters = {
-  all: todos => todos,
-  active: todos => todos.filter(todo => !todo.done),
-  completed: todos => todos.filter(todo => todo.done)
+  all: todos => todos
+  // active: todos => todos.filter(todo => todo.flag !== 0),
+  // completed: todos => todos.filter(todo => todo.flag === 0)
 }
-const defalutList = [
-  { text: '早上6:00 早饭时间', done: false },
-  { text: '早上8:00 巡查时间', done: false },
-  { text: '中午12:00 午饭时间', done: false },
-  { text: '下午18:00 晚饭时间', done: true },
-  { text: '早上提醒老人吃药', done: true },
-  { text: '提醒吴xx运动', done: true },
-  { text: '吴xx腕带电量耗尽', done: true }
-]
 export default {
   components: { Todo },
   data() {
     return {
       visibility: 'all',
-      filters,
+      filters
       // todos: JSON.parse(window.localStorage.getItem(STORAGE_KEY)) || defalutList
-      todos: defalutList
+      // todos: defalutList
     }
   },
   computed: {
+    ...mapGetters([
+      'notifications'
+    ]),
     allChecked() {
-      return this.todos.every(todo => todo.done)
+      return this.notifications.every(todo => todo.flag === 0)
     },
     filteredTodos() {
-      return filters[this.visibility](this.todos)
+      return filters[this.visibility](this.notifications)
     },
     remaining() {
-      return this.todos.filter(todo => !todo.done).length
+      return this.notifications.filter(todo => todo.flag !== 0).length
     }
   },
   methods: {
@@ -86,19 +81,21 @@ export default {
       e.target.value = ''
     },
     toggleTodo(val) {
-      val.done = !val.done
-      this.setLocalStorgae()
+      this.deleteTodo(val)
     },
     deleteTodo(todo) {
-      this.todos.splice(this.todos.indexOf(todo), 1)
-      this.setLocalStorgae()
+      this.$store.dispatch('DeleteNotification', todo.id).then(res => {
+        console.log('a', res)
+      }).catch(() => {
+        console.log('删除失败')
+      })
     },
     editTodo({ todo, value }) {
       todo.text = value
       this.setLocalStorgae()
     },
     clearCompleted() {
-      this.todos = this.todos.filter(todo => !todo.done)
+      this.notifications = this.notifications.filter(todo => !todo.done)
       this.setLocalStorgae()
     },
     toggleAll({ done }) {

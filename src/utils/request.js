@@ -7,8 +7,12 @@ import { getToken } from '@/utils/auth'
 const service = axios.create({
   baseURL: process.env.BASE_API, // api的base_url
   headers: {
-    'Content-type': 'application/json'
+    'Content-type': 'application/json',
+    'Access-Control-Allow-Origin': 'http://localhost:9527',
+    // 'Origin': 'http://localhost:9527',
+    'Access-Control-Allow-Credentials': true
   },
+  withCredentials: true,
   timeout: 5000 // request timeout
 })
 

@@ -68,7 +68,7 @@
 </template>
 
 <script>
-// import { mapGetters } from 'vuex'
+import { nurseDetail } from '@/api/detail'
 import BMap from '@/components/BaiduMap'
 
 export default {
@@ -81,26 +81,34 @@ export default {
   },
   created() {
     // this.getData(this.$route.params.nurseId)
-    this.getData()
+    this.getData(this.$route.params.nurseId)
   },
   beforeRouteUpdate(to, from, next) {
-    this.getData()
+    this.getData(to.params.nurseId)
     next()
   },
   methods: {
-    getData() {
+    getData(id) {
       // const id = this.$route.params.nurseId
-      this.nurse = {
-        id: 110,
-        name: '吴XX',
-        sex: '男',
-        age: 12,
-        rate: 10,
-        time: 10,
-        avatar: require('../../assets/images/avatar.jpg'),
-        introduction: '------------ 个人介绍 --------------',
-        evaluation: '------------ 评价 -------------'
-      }
+      // this.nurse = {
+      //   id: 110,
+      //   name: '吴XX',
+      //   sex: '男',
+      //   age: 12,
+      //   rate: 10,
+      //   time: 10,
+      //   avatar: require('../../assets/images/avatar.jpg'),
+      //   introduction: '------------ 个人介绍 --------------',
+      //   evaluation: '------------ 评价 -------------'
+      // }
+      nurseDetail(id).then(res => {
+        if (res.data.code !== 0) {
+          this.$message.error('基本信息加载失败')
+          console.log(res)
+        }
+        this.nurse = res.data
+        this.getElderList()
+      })
     }
   },
   computed: {}

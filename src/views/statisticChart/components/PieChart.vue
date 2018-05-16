@@ -31,7 +31,7 @@ export default {
     }
   },
   mounted() {
-    this.initChart()
+    setTimeout(this.initChart, 1000)
     this.__resizeHanlder = debounce(() => {
       if (this.chart) {
         this.chart.resize()

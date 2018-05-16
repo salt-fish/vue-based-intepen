@@ -13,7 +13,7 @@
       <el-table-column header-align="center" width="70" label="编号" prop="id"></el-table-column>
       <el-table-column header-align="center" width="50" label="姓名" prop="name"></el-table-column>
       <el-table-column header-align="center" width="50" label="性别" prop="sex"></el-table-column>
-      <el-table-column header-align="center" width="50" label="年龄" prop="age"></el-table-column>
+      <el-table-column header-align="center" width="50" label="年龄" prop="birthday" :formatter="formatter"></el-table-column>
       <el-table-column header-align="center" label="身份证" prop="idCard"></el-table-column>
       <el-table-column header-align="center" width="116" label="家属联系方式" prop="tel"></el-table-column>
       <el-table-column header-align="center" width="100" label="生日" prop="birthday"></el-table-column>
@@ -47,7 +47,7 @@
       </el-row>
       <el-row :gutter="20">
         <el-col :span="2" :offset="2">年龄:</el-col>
-        <el-col :span="4"><el-input size="mini" v-model.number="elderData[dialogDataIndex].age"></el-input></el-col>
+        <el-col :span="4">{{ age(elderData[dialogDataIndex].birthday) }}</el-col>
         <el-col :span="3" :offset="0">身份证:</el-col>
         <el-col :span="10"><el-input size="mini" v-model.number="elderData[dialogDataIndex].idCard"></el-input></el-col>
       </el-row>
@@ -89,11 +89,14 @@
         <el-col :span="3" :offset="0">姓名:</el-col>
         <el-col :span="4"><el-input size="mini" v-model="newData.name"></el-input></el-col>
         <el-col :span="2 " :offset="0">性别:</el-col>
-        <el-col :span="4"><el-input size="mini" v-model="newData.sex"></el-input></el-col>
+        <el-col :span="4">
+          <el-select v-model="newData.sex" placeholder="选择">
+            <el-option label="男" value="男"></el-option>
+            <el-option label="女" value="女"></el-option>
+          </el-select>
+        </el-col>
       </el-row>
       <el-row :gutter="20">
-        <el-col :span="2" :offset="2">年龄:</el-col>
-        <el-col :span="4"><el-input size="mini" v-model.number="newData.age"></el-input></el-col>
         <el-col :span="3" :offset="0">身份证:</el-col>
         <el-col :span="10"><el-input size="mini" v-model.number="newData.idCard"></el-input></el-col>
       </el-row>
@@ -133,7 +136,7 @@
 <script>
 // import
 import { mapGetters } from 'vuex'
-import { deepClone, objectMerge } from '@/utils'
+import { deepClone, objectMerge, jsGetAge } from '@/utils'
 import { getElder, addElder, editElder, deleteElder } from '@/api/older'
 
 export default {
@@ -149,7 +152,7 @@ export default {
         name: '',
         sex: '',
         age: 0,
-        idCard: 0,
+        idCard: '',
         birthday: '',
         inHospital: '',
         bed: '',
@@ -163,17 +166,8 @@ export default {
       newDialogVisibel: false
     }
   },
-  beforeCreate() {
-    // this.getElderList()
-    this.$nextTick(() => {
-      this.getElderList()
-    })
-  },
-  mounted() {
-    // this.$nextTick(() => {
-    //   this.getElderList()
-    // })
-    console.log('mounted', this.elderData)
+  created() {
+    this.getElderList()
   },
   methods: {
     getElderList() {
@@ -181,21 +175,11 @@ export default {
         if (res.data.code !== 0) {
           this.$message.error('列表初始化失败')
         }
-        console.log('in')
-        console.log(res.data.data)
         this.elderData = res.data.data
       }).catch(error => {
         console.log(error)
         this.$message.error('列表初始化失败')
       })
-      // this.elderData = [
-      //   { id: 110, name: '吴xx', sex: '男', age: 233, idCard: 610302000000000000, birthday: '2000-01-01', inHospital: '2017-10-01', bed: '2楼222室2床', docName: '小明', tel: 13032885319, avatar: require('../../assets/images/avatar.jpg'), visible: false },
-      //   { id: 111, name: '吴xx', sex: '男', age: 233, idCard: 1111111111, birthday: '2000-01-01', inHospital: '2017-10-01', bed: '2楼222室2床', docName: '小明', tel: 13032885319, avatar: require('../../assets/images/avatar.jpg'), visible: false },
-      //   { id: 112, name: '吴xx', sex: '男', age: 233, idCard: 1111111111, birthday: '2000-01-01', inHospital: '2017-10-01', bed: '2楼222室2床', docName: '小明', tel: 13032885319, avatar: require('../../assets/images/avatar.jpg'), visible: false },
-      //   { id: 113, name: '吴xx', sex: '男', age: 233, idCard: 1111111111, birthday: '2000-01-01', inHospital: '2017-10-01', bed: '2楼222室2床', docName: '小明', tel: 13032885319, avatar: require('../../assets/images/avatar.jpg'), visible: false },
-      //   { id: 114, name: '吴xx', sex: '男', age: 233, idCard: 1111111111, birthday: '2000-01-01', inHospital: '2017-10-01', bed: '2楼222室2床', docName: '小明', tel: 13032885319, avatar: require('../../assets/images/avatar.jpg'), visible: false }
-      // ]
-      setTimeout(() => {console.log('1',this.elderData)}, 1000)
     },
     retrieveElder(index) {
       // params: { markDoneType, id }
@@ -214,7 +198,9 @@ export default {
         addElder(this.newData).then(res => {
           if (res.data.code !== 0) {
             this.$message.error('添加失败')
+            console.log(res)
           }
+          this.getElderList()
         }).catch(error => {
           console.log(error)
           this.$message.error('添加失败')
@@ -225,10 +211,12 @@ export default {
         const tmp = this.elderData[this.dialogDataIndex]
         console.log('update:')
         console.log(tmp)
-        editElder(this.newData).then(res => {
+        editElder(tmp).then(res => {
           if (res.data.code !== 0) {
             this.$message.error('修改失败')
+            console.log(res)
           }
+          this.getElderList()
         }).catch(error => {
           console.log(error)
           this.$message.error('修改失败')
@@ -241,12 +229,14 @@ export default {
       deleteElder(this.data[index].id).then(res => {
         if (res.data.code !== 0) {
           this.$message.error('删除失败')
+          console.log(res)
         }
+        this.data[index].visible = false
+        this.getElderList()
       }).catch(error => {
         console.log(error)
         this.$message.error('删除失败')
       })
-      console.log(this.elderData)
     },
     cancel() {
       if (this.newDialogVisibel) {
@@ -288,6 +278,14 @@ export default {
         this.$message.error('上传头像图片大小不能超过 2MB!')
       }
       return isJPG && isLt2M
+    },
+    age(birthday) {
+      return jsGetAge(birthday)
+    },
+    formatter(row, column, cellValue) {
+      if (cellValue) {
+        return jsGetAge(cellValue)
+      }
     }
   },
   computed: {

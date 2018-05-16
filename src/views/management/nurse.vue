@@ -7,7 +7,7 @@
       <el-form-item label="护工姓名">
         <el-input v-model="searchQuery.name" placeholder="护工姓名"></el-input>
       </el-form-item>
-      <el-button type="success" plain @click="newDialog">添加</el-button>
+      <!-- <el-button type="success" plain @click="newDialog">添加</el-button> -->
     </el-form>
     <el-table border :data="data" style="width: 100%">
       <el-table-column header-align="center" label="编号" prop="id"></el-table-column>
@@ -130,6 +130,7 @@
 // import
 import { mapGetters } from 'vuex'
 import { deepClone, objectMerge } from '@/utils'
+import { getNurse, addNurse, editNurse, deleteNurse } from '@/api/nurse'
 
 export default {
   data() {
@@ -161,13 +162,23 @@ export default {
   },
   methods: {
     getNurseList() {
-      this.nurseData = [
-        { id: 110, name: 'a', sex: 'man', age: 12, rate: 10, time: 10, avatar: require('../../assets/images/avatar.jpg'), introduction: '------------ 个人介绍 --------------', evaluation: '------------ 评价 -------------', visible: false },
-        { id: 111, name: 'a', sex: 'female', age: 22, rate: 4, time: 3, avatar: require('../../assets/images/avatar.jpg'), introduction: '------------ 个人介绍 --------------', evaluation: '------------ 评价 -------------', visible: false },
-        { id: 112, name: 'c', sex: 'man', age: 12, rate: 10, time: 10, avatar: require('../../assets/images/avatar.jpg'), introduction: '------------ 个人介绍 --------------', evaluation: '------------ 评价 -------------', visible: false },
-        { id: 113, name: 'd', sex: 'man', age: 12, rate: 10, time: 10, avatar: require('../../assets/images/avatar.jpg'), introduction: '------------ 个人介绍 --------------', evaluation: '------------ 评价 -------------', visible: false },
-        { id: 114, name: 'e', sex: 'man', age: 12, rate: 10, time: 10, avatar: require('../../assets/images/avatar.jpg'), introduction: '------------ 个人介绍 --------------', evaluation: '------------ 评价 -------------', visible: false }
-      ]
+      getNurse().then(res => {
+        if (res.data.code !== 0) {
+          this.$message.error('列表初始化失败')
+        }
+        this.nurseData = res.data.data
+        console.log(this.nurseData)
+      }).catch(error => {
+        console.log(error)
+        this.$message.error('列表初始化失败')
+      })
+      // this.nurseData = [
+      //   { id: 110, name: 'a', sex: 'man', age: 12, rate: 10, time: 10, avatar: require('../../assets/images/avatar.jpg'), introduction: '------------ 个人介绍 --------------', evaluation: '------------ 评价 -------------', visible: false },
+      //   { id: 111, name: 'a', sex: 'female', age: 22, rate: 4, time: 3, avatar: require('../../assets/images/avatar.jpg'), introduction: '------------ 个人介绍 --------------', evaluation: '------------ 评价 -------------', visible: false },
+      //   { id: 112, name: 'c', sex: 'man', age: 12, rate: 10, time: 10, avatar: require('../../assets/images/avatar.jpg'), introduction: '------------ 个人介绍 --------------', evaluation: '------------ 评价 -------------', visible: false },
+      //   { id: 113, name: 'd', sex: 'man', age: 12, rate: 10, time: 10, avatar: require('../../assets/images/avatar.jpg'), introduction: '------------ 个人介绍 --------------', evaluation: '------------ 评价 -------------', visible: false },
+      //   { id: 114, name: 'e', sex: 'man', age: 12, rate: 10, time: 10, avatar: require('../../assets/images/avatar.jpg'), introduction: '------------ 个人介绍 --------------', evaluation: '------------ 评价 -------------', visible: false }
+      // ]
     },
     retrieveNurse(index) {
       var id = this.nurseData[index].id
@@ -179,18 +190,48 @@ export default {
         this.newDialogVisibel = false
         console.log('new')
         console.log(this.newData)
+        addNurse(this.newData).then(res => {
+          if (res.data.code !== 0) {
+            this.$message.error('添加失败')
+            console.log(res)
+          }
+          this.getNurseList()
+        }).catch(error => {
+          console.log(error)
+          this.$message.error('添加失败')
+        })
         this.newData = deepClone(this.originData)
       } else {
         // edit
         const tmp = this.nurseData[this.dialogDataIndex]
         console.log('update:')
         console.log(tmp)
+        editNurse(tmp).then(res => {
+          if (res.data.code !== 0) {
+            this.$message.error('修改失败')
+            console.log(res)
+          }
+          this.getNurseList()
+        }).catch(error => {
+          console.log(error)
+          this.$message.error('修改失败')
+        })
         this.editDialogVisibel = false
       }
     },
     deleteNurse(index) {
       // ajax deleteNurse(this.data[dataIndex].id)
-      console.log(this.nurseData)
+      deleteNurse(this.data[index].id).then(res => {
+        if (res.data.code !== 0) {
+          this.$message.error('删除失败')
+          console.log(res)
+        }
+        this.data[index].visible = false
+        this.getNurseList()
+      }).catch(error => {
+        console.log(error)
+        this.$message.error('删除失败')
+      })
     },
     cancel() {
       if (this.newDialogVisibel) {

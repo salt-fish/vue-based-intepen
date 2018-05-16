@@ -39,15 +39,12 @@
         <el-form-item label="用户名称">
           <el-input v-model="userList[dialogDataIndex].name" size="mini" :readonly="true"></el-input>
         </el-form-item>
-        <el-form-item label="用户密码">
-          <el-input v-model="userList[dialogDataIndex].password" size="mini"></el-input>
-        </el-form-item>
         <el-form-item label="用户电话">
           <el-input v-model="userList[dialogDataIndex].tel" size="mini" placeholder="用户电话"></el-input>
         </el-form-item>
       </el-form>
       <div style="text-align: center">
-        <el-transfer style="text-align: left; display: inline-block" v-model="userList[dialogDataIndex].hasAuth" :props="{ key: 'id', label: 'comment' }" :data="authList" :titles="['权限列表', '已有权限']"></el-transfer>
+        <el-transfer style="text-align: left; display: inline-block" v-model="userList[dialogDataIndex].hasAuth" :props="{ key: 'id', label: 'description' }" :data="rolesList" :titles="['权限列表', '已有权限']"></el-transfer>
       </div>
       <span slot="footer">
         <el-button @click="cancel">取 消</el-button>
@@ -60,16 +57,22 @@
         <el-form-item label="用户名称">
           <el-input v-model="newData.name" size="mini" placeholder="用户姓名"></el-input>
         </el-form-item>
+        <el-form-item label="用户账号">
+          <el-input v-model="newData.account" size="mini" placeholder="用户账号"></el-input>
+        </el-form-item>
         <el-form-item label="用户密码">
           <el-input v-model="newData.password" size="mini" placeholder="用户密码"></el-input>
         </el-form-item>
         <el-form-item label="用户电话">
           <el-input v-model="newData.tel" size="mini" placeholder="用户电话"></el-input>
         </el-form-item>
+        <el-form-item>
+          <el-select v-model="newData.flags" placeholder="请选择">
+            <el-option label="用户(家属)" value="1"></el-option>
+            <el-option label="护工" value="2"></el-option>
+          </el-select>
+        </el-form-item>
       </el-form>
-      <div style="text-align: center">
-        <el-transfer style="text-align: left; display: inline-block" v-model="newData.hasAuth" :props="{ key: 'id', label: 'comment' }" :data="authList" :titles="['权限列表', '已有权限']"></el-transfer>
-      </div>
       <span slot="footer">
         <el-button @click="cancel">取 消</el-button>
         <el-button type="primary" @click="updateUser">确 定</el-button>
@@ -80,6 +83,8 @@
 
 <script>
 import { deepClone, objectMerge } from '@/utils'
+import { getRolesList, getUserList, addUser, distribute, deleteUser } from '@/api/permission'
+import { addNurse } from '@/api/nurse'
 
 export default{
   name: 'permission',
@@ -91,12 +96,13 @@ export default{
         tel: ''
       },
       userList: [],
-      authList: [],
+      rolesList: [],
       originData: {},
       newData: {
         name: '',
         password: '',
         tel: 0,
+        flags: '1', // 1. 用户（家属）2. 护工
         hasAuth: []
       },
       editDialogVisibel: false,
@@ -106,31 +112,54 @@ export default{
   },
   created() {
     this.getUserList()
-    this.getAuthList()
+    this.getRolesList()
   },
   methods: {
     getUserList() {
-      this.userList = [
-        { id: 1, name: '小明', password: 'a12345', tel: 110, hasAuth: [1, 2, 3, 4] },
-        { id: 2, name: '小红', password: 'a12345', tel: 13030000000, hasAuth: [3, 4] }
-      ]
+      getUserList().then(res => {
+        if (res.data.code !== 0) {
+          this.$message.error('列表初始化失败')
+        }
+        this.userList = res.data.data
+        this.userList.map(v => {
+          this.$set(v, 'visible', false)
+        })
+        console.log(this.userList)
+      }).catch(error => {
+        console.log(error)
+        this.$message.error('列表初始化失败')
+      })
+      // this.userList = [
+      //   { id: 1, name: '小明', password: 'a12345', tel: 110, hasAuth: [1, 2, 3, 4] },
+      //   { id: 2, name: '小红', password: 'a12345', tel: 13030000000, hasAuth: [3, 4] }
+      // ]
     },
-    getAuthList() {
-      this.authList = [
-        { id: 1, name: 'admin', comment: '超级管理员' },
-        { id: 2, name: 'userDetail', comment: '病人信息' },
-        { id: 3, name: 'service', comment: '服务' },
-        { id: 4, name: 'statistic', comment: '统计信息' },
-        { id: 5, name: 'inspection', comment: '巡查结果' },
-        { id: 6, name: 'elderManagement', comment: '老人管理' },
-        { id: 7, name: 'nurseManagement', comment: '护士管理' },
-        { id: 8, name: 'detail', comment: '老人、护士详细信息' },
-        { id: 9, name: 'documentation', comment: '健康管理' },
-        { id: 10, name: 'relation', comment: '关联家属' },
-        { id: 11, name: 'notification', comment: '通知列表' },
-        { id: 12, name: 'permission', comment: '权限管理' },
-        { id: 13, name: 'settings', comment: '设置' }
-      ]
+    getRolesList() {
+      getRolesList().then(res => {
+        if (res.data.code !== 0) {
+          this.$message.error('列表初始化失败')
+        }
+        this.rolesList = res.data.data
+        console.log(this.rolesList)
+      }).catch(error => {
+        console.log(error)
+        this.$message.error('列表初始化失败')
+      })
+      // this.rolesList = [
+      //   { id: 1, role: 'admin', description: '超级管理员' },
+      //   { id: 2, role: 'userDetail', description: '病人信息' },
+      //   { id: 3, role: 'service', description: '服务' },
+      //   { id: 4, role: 'statistic', description: '统计信息' },
+      //   { id: 5, role: 'inspection', description: '巡查结果' },
+      //   { id: 6, role: 'elderManagement', description: '老人管理' },
+      //   { id: 7, role: 'nurseManagement', description: '护士管理' },
+      //   { id: 8, role: 'detail', description: '老人、护士详细信息' },
+      //   { id: 9, role: 'documentation', description: '健康管理' },
+      //   { id: 10, role: 'relation', description: '关联家属' },
+      //   { id: 11, role: 'notification', description: '通知列表' },
+      //   { id: 12, role: 'permission', description: '权限管理' },
+      //   { id: 13, role: 'settings', description: '设置' }
+      // ]
     },
     updateUser() {
       // 在做编辑时 要加入权限判断
@@ -138,12 +167,52 @@ export default{
       if (this.newDialogVisibel) {
         // new
         this.newDialogVisibel = false
-        console.log('new')
-        console.log(this.newData)
+        const tmp = this.newData
+        console.log(typeof tmp.flags)
+        if (tmp.flags === '1') {
+          // 增加用户
+          addUser(tmp).then(res => {
+            if (res.data.code !== 0) {
+              this.$message.error('新增用户失败')
+            } else {
+              this.$message.success('新增用户成功，请继续为其分配权限')
+              this.getUserList()
+            }
+          }).catch(error => {
+            console.log(error)
+            this.$message.error('新增用户失败')
+          })
+        } else if (tmp.flags === '2') {
+          // 增加护工
+          addNurse(tmp).then(res => {
+            if (res.data.error) {
+              this.$message.error(res.data.error)
+            } else {
+              this.$message.success('新增护工成功，请继续为其分配权限')
+            }
+            console.log(res)
+            this.getUserList()
+          }).catch(error => {
+            console.log(error)
+            this.$message.error('新增护工失败')
+          })
+        } else {
+          this.$message.error('新增失败')
+        }
         this.newData = deepClone(this.originData)
       } else {
         // edit
         const tmp = this.userList[this.dialogDataIndex]
+        distribute(tmp.id, tmp.hasAuth).then(res => {
+          if (res.data.code !== 0) {
+            this.$message.error('分配权限失败')
+          } else {
+            this.$message.success('分配权限成功')
+          }
+        }).catch(error => {
+          console.log(error)
+          this.$message.error('分配权限失败')
+        })
         console.log('update:')
         console.log(tmp)
         this.editDialogVisibel = false
@@ -151,6 +220,19 @@ export default{
     },
     deleteUser(index) {
       // ajax deleteNurse(this.data[dataIndex].id)
+      const tmp = this.data[index]
+      deleteUser(tmp.id).then(res => {
+        if (res.data.code !== 0) {
+          this.$message.error('删除角色失败')
+        } else {
+          this.$message.success('删除角色成功')
+          this.getUserList()
+        }
+        console.log(res)
+      }).catch(error => {
+        console.log(error)
+        this.$message.error('删除角色失败')
+      })
       console.log(this.userList)
     },
     cancel() {

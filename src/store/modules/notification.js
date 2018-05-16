@@ -28,6 +28,7 @@ const notification = {
           if (response.data.code !== 0) {
             reject('error get notifications')
           }
+          // commit('INIT_NOTICE', response.data)
           commit('INIT_NOTICE', response.data.data)
           resolve(response)
         }).catch(error => {
@@ -39,10 +40,9 @@ const notification = {
     AddNotification({ commit }, notification) {
       return new Promise((resolve, reject) => {
         addNotification(notification).then(response => {
-          if (!response.data) {
+          if (response.data.code !== 0) {
             reject('add notification error')
           }
-          commit('INIT_NOTICE', response.data)
           resolve(response)
         }).catch(error => {
           reject(error)
@@ -50,14 +50,13 @@ const notification = {
       })
     },
     // 删除通知
-    DeleteNotification({ commit }, notification) {
+    DeleteNotification({ commit }, id) {
       return new Promise((resolve, reject) => {
-        deleteNotification(notification).then(response => {
-          if (!response.data) {
+        deleteNotification(id).then(response => {
+          if (response.data.code !== 0) {
             reject('delete notification error')
           }
-          commit('INIT_NOTICE', response.data)
-          resolve('成功')
+          resolve(response.data.data)
         }).catch(error => {
           reject(error)
         })

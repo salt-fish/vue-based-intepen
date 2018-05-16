@@ -28,8 +28,8 @@
         <span>密码 : 随便填</span>
       </div>
       <div class="tips">
-        <span style="margin-right:18px;">账号 : editor</span>
-        <span>密码 : 随便填</span>
+        <span style="margin-right:18px;">账号 : nurse</span>
+        <span>密码 : 111111</span>
       </div>
     </el-form>
   </div>

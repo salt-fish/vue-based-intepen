@@ -35,7 +35,7 @@ export default {
     }
   },
   mounted() {
-    this.initChart()
+    setTimeout(this.initChart, 1000)
     if (this.autoResize) {
       this.__resizeHanlder = debounce(() => {
         if (this.chart) {
@@ -74,16 +74,26 @@ export default {
   methods: {
     setOptions(data) {
       const seriesData = []
-
       for (let i = 0; i < data.type.length; i++) {
-        seriesData.push({
-          name: data.type[i],
-          smooth: true,
-          type: 'line',
-          data: data[data.name[i]],
-          animationDuration: 2800,
-          animationEasing: 'quadraticOut'
-        })
+        if (data.type.length === 1) {
+          seriesData.push({
+            name: data.type[i],
+            smooth: true,
+            type: 'line',
+            data: data['number'],
+            animationDuration: 2800,
+            animationEasing: 'quadraticOut'
+          })
+        } else {
+          seriesData.push({
+            name: data.type[i],
+            smooth: true,
+            type: 'line',
+            data: data[data.name[i]],
+            animationDuration: 2800,
+            animationEasing: 'quadraticOut'
+          })
+        }
       }
 
       this.chart.setOption({

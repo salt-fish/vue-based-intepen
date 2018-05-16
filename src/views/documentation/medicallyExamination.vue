@@ -8,7 +8,7 @@
         <el-input v-model="searchQuery.name" placeholder="老人姓名"></el-input>
       </el-form-item>
       <el-form-item label="选择时间">
-        <el-date-picker v-model="searchQuery.timeRange" :clearable="false" style="width: 260px;" unlink-panels type="daterange" range-separator="-" start-placeholder="开始时间" end-placeholder="结束时间" value-format="yyyy-MM-dd">
+        <el-date-picker v-model="searchQuery.timeRange" :clearable="false" style="width: 260px;" unlink-panels type="daterange" range-separator="-" start-placeholder="开始时间" end-placeholder="结束时间" :picker-options="pickerOption" value-format="yyyy-MM-dd">
         </el-date-picker>
       </el-form-item>
       <el-button type="success" plain @click="newDialog">添加</el-button>
@@ -36,10 +36,9 @@
       <el-table-column header-align="center" width="80" label="记录编号" prop="examination[0].id"></el-table-column>
       <el-table-column header-align="center" width="50" label="姓名" prop="name"></el-table-column>
       <el-table-column header-align="center" width="50" label="性别" prop="sex"></el-table-column>
-      <el-table-column header-align="center" width="50" label="年龄" prop="age"></el-table-column>
+      <el-table-column header-align="center" width="50" label="年龄" prop="birthday" :formatter="formatter"></el-table-column>
       <el-table-column header-align="center" label="身份证" prop="idCard"></el-table-column>
-      <el-table-column header-align="center" width="80" label="主治医师" prop="docName"></el-table-column>
-      <el-table-column header-align="center" label="操作" :width="roles[0] === 'admin' ? '250' : '150'" align="center">
+      <el-table-column header-align="center" label="操作" :width="roles.includes('admin') ? '250' : '150'" align="center">
         <template slot-scope="scope">
           <el-popover ref="refuse" placement="top-start" width="160" v-model="scope.row.visible">
             <p>确定要删除这条记录吗?</p>
@@ -48,8 +47,8 @@
               <el-button size="mini" type="danger" @click="deleteRecord(scope.$index)">确认</el-button>
             </div>
           </el-popover>  
-          <el-button v-if="roles[0] === 'admin'" size="mini" @click="eidtDialog(scope.$index)">编辑</el-button>
-          <el-button v-if="roles[0] === 'admin'" size="mini" v-popover:refuse>删除</el-button>
+          <el-button v-if="roles.includes('admin')" size="mini" @click="eidtDialog(scope.$index)">编辑</el-button>
+          <el-button v-if="roles.includes('admin')" size="mini" v-popover:refuse>删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -65,9 +64,7 @@
       </el-row>
       <el-row :gutter="20">
         <el-col :span="2" :offset="2">年龄:</el-col>
-        <el-col :span="4">{{ examinationData[dialogDataIndex].age }}</el-col>
-        <el-col :span="4" :offset="0">主治医师:</el-col>
-        <el-col :span="4">{{ examinationData[dialogDataIndex].docName }}</el-col>
+        <el-col :span="4">{{ age(examinationData[dialogDataIndex].birthday) }}</el-col>
         <el-col :span="4" :offset="0">记录时间:</el-col>
         <el-col :span="4">{{ examinationData[dialogDataIndex].examination[0].date }}</el-col>
       </el-row>
@@ -148,17 +145,6 @@
             </el-option>
           </el-select>
         </el-col>
-        <el-col :span="4" :offset="0">主治医师:</el-col>
-        <el-col :span="4">
-          <el-select v-model="newData[0].docId" placeholder="请选择">
-            <el-option
-              v-for="item in doctorList"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id">
-            </el-option>
-          </el-select>
-        </el-col>
       </el-row>
 
       <el-table border height="250" :data="newData" style="width: auto;margin: 0 auto;">
@@ -227,7 +213,9 @@
 <script>
 // import
 import { mapGetters } from 'vuex'
-import { deepClone, objectMerge, getNowFormatDate } from '@/utils'
+import { deepClone, objectMerge, getNowFormatDate, jsGetAge } from '@/utils'
+import { getMedicalbydate, getMedicalHistory, editMedical, addMedical, deleteMedical } from '@/api/documentation'
+import { getElder } from '@/api/older'
 
 export default {
   name: 'medicallyExamination',
@@ -238,24 +226,27 @@ export default {
         name: '',
         timeRange: ''
       },
+      pickerOption: {
+        disabledDate(time) {
+          return time.getTime() > Date.now()
+        }
+      },
       examinationData: [],
-      doctorList: [],
       elderList: [],
       originData: {},
       newData: [{
         elderId: 0,
-        docId: 0,
 
         date: getNowFormatDate().toString(),
-        height: '',
-        weight: '',
+        height: 0,
+        weight: 0,
         gangong: '',
-        xuetang: '',
-        Cholesterol: '',
-        danguchun: '',
-        TG: '',
-        HDL_Cholesterol: '',
-        LDL_Cholesterol: '',
+        xuetang: 0,
+        Cholesterol: 0,
+        danguchun: 0,
+        TG: 0,
+        HDL_Cholesterol: 0,
+        LDL_Cholesterol: 0,
         shengong: '',
         bchao: '',
 
@@ -264,46 +255,81 @@ export default {
       editDialogVisibel: false,
       dialogDataIndex: 0,
       newDialogVisibel: false,
-      today: getNowFormatDate()
+      today: getNowFormatDate(),
+
+      examination: []
     }
   },
   created() {
-    this.getList()
-    this.getDoctor()
     this.getElder()
+    setTimeout(this.getList(), 1000)
   },
   methods: {
     getList() {
-      this.examinationData = [
-        { name: '吴xx', sex: '男', age: 21, idCard: 610302000000000000, docName: '小明', examination: [{ id: '000001', elderId: 1,
-          docId: 1, date: '2018-04-12', height: '1.70', weight: '67.0', gangong: '正常', xuetang: '100', Cholesterol: '40',
-          danguchun: '50', TG: '40', HDL_Cholesterol: '40', LDL_Cholesterol: '40', shengong: '正常', bchao: '正常' }],
-        visible: false },
-        { name: '吴xx', sex: '男', age: 21, idCard: 555555555, docName: '小明', examination: [{ id: '000002', elderId: 1,
-          docId: 1, date: '2018-04-12', height: '1.70', weight: '67.0', gangong: '正常', xuetang: '100', Cholesterol: '40',
-          danguchun: '50', TG: '40', HDL_Cholesterol: '40', LDL_Cholesterol: '40', shengong: '正常', bchao: '正常' }],
-        visible: false },
-        { name: '吴xx', sex: '男', age: 21, idCard: 44444, docName: '小明', examination: [{ id: '000003', elderId: 1,
-          docId: 1, date: '2018-04-12', height: '1.70', weight: '67.0', gangong: '正常', xuetang: '100', Cholesterol: '40',
-          danguchun: '50', TG: '40', HDL_Cholesterol: '40', LDL_Cholesterol: '40', shengong: '正常', bchao: '正常' }],
-        visible: false },
-        { name: '吴xx', sex: '男', age: 21, idCard: 33333333, docName: '小明', examination: [{ id: '000004', elderId: 1,
-          docId: 1, date: '2018-04-12', height: '1.70', weight: '67.0', gangong: '正常', xuetang: '100', Cholesterol: '40',
-          danguchun: '50', TG: '40', HDL_Cholesterol: '40', LDL_Cholesterol: '40', shengong: '正常', bchao: '正常' }],
-        visible: false }
-      ]
+      getMedicalbydate(this.today).then(res => {
+        if (res.data.code !== 0) {
+          this.$message.error('列表初始化失败')
+        }
+        this.examination = res.data.data
+      }).catch(error => {
+        console.log(error)
+        this.$message.error('列表初始化失败')
+      })
+      setTimeout(this.dealData, 1000)
+      // this.examinationData = [
+      //   { name: '吴xx', sex: '男', age: 21, idCard: 610302000000000000, docName: '小明', examination: [{ id: '000001', elderId: 1,
+      //     docId: 1, date: '2018-04-12', height: '1.70', weight: '67.0', gangong: '正常', xuetang: '100', Cholesterol: '40',
+      //     danguchun: '50', TG: '40', HDL_Cholesterol: '40', LDL_Cholesterol: '40', shengong: '正常', bchao: '正常' }],
+      //   visible: false },
+      //   { name: '吴xx', sex: '男', age: 21, idCard: 555555555, docName: '小明', examination: [{ id: '000002', elderId: 1,
+      //     docId: 1, date: '2018-04-12', height: '1.70', weight: '67.0', gangong: '正常', xuetang: '100', Cholesterol: '40',
+      //     danguchun: '50', TG: '40', HDL_Cholesterol: '40', LDL_Cholesterol: '40', shengong: '正常', bchao: '正常' }],
+      //   visible: false },
+      //   { name: '吴xx', sex: '男', age: 21, idCard: 44444, docName: '小明', examination: [{ id: '000003', elderId: 1,
+      //     docId: 1, date: '2018-04-12', height: '1.70', weight: '67.0', gangong: '正常', xuetang: '100', Cholesterol: '40',
+      //     danguchun: '50', TG: '40', HDL_Cholesterol: '40', LDL_Cholesterol: '40', shengong: '正常', bchao: '正常' }],
+      //   visible: false },
+      //   { name: '吴xx', sex: '男', age: 21, idCard: 33333333, docName: '小明', examination: [{ id: '000004', elderId: 1,
+      //     docId: 1, date: '2018-04-12', height: '1.70', weight: '67.0', gangong: '正常', xuetang: '100', Cholesterol: '40',
+      //     danguchun: '50', TG: '40', HDL_Cholesterol: '40', LDL_Cholesterol: '40', shengong: '正常', bchao: '正常' }],
+      //   visible: false }
+      // ]
     },
-    getDoctor() {
-      this.doctorList = [
-        { name: '小明', id: 1 },
-        { name: '小黑', id: 2 }
-      ]
+    dealData() {
+      console.log('deal')
+      this.examinationData = []
+      this.examination.forEach(value => {
+        this.examinationData.push({
+          examination: [value]
+        })
+      })
+
+      this.examinationData.map(v => {
+        const t = this.elderList.filter(function(value) {
+          if (value.id === v.examination[0].elderId) {
+            return value
+          }
+        })[0]
+        if (t) {
+          this.$set(v, 'sex', t.sex)
+          this.$set(v, 'name', t.name)
+          this.$set(v, 'birthady', t.birthady)
+          this.$set(v, 'idCard', t.idCard)
+          this.$set(v, 'visible', false)
+        }
+      })
     },
     getElder() {
-      this.elderList = [
-        { name: '吴xx', id: 1 },
-        { name: '李xx', id: 2 }
-      ]
+      getElder().then(res => {
+        if (res.data.code !== 0) {
+          this.$message.error('列表初始化失败')
+        }
+        this.elderList = res.data.data
+        // console.log(this.elderList)
+      }).catch(error => {
+        console.log(error)
+        this.$message.error('列表初始化失败')
+      })
     },
     updateRecord() {
       // 在做编辑时 要加入权限判断
@@ -311,19 +337,48 @@ export default {
       if (this.newDialogVisibel) {
         // new
         this.newDialogVisibel = false
-        console.log('new')
-        console.log(this.newData)
+        addMedical(this.newData[0]).then(res => {
+          if (res.data.code !== 0) {
+            this.$message.error('添加失败')
+            console.log(res)
+          }
+          this.getList()
+        }).catch(error => {
+          console.log(error)
+          this.$message.error('添加失败')
+        })
         this.newData = deepClone(this.originData)
       } else {
         // edit
         const tmp = this.examinationData[this.dialogDataIndex]
         console.log('update:')
         console.log(tmp)
+        editMedical(tmp.examination[0]).then(res => {
+          if (res.data.code !== 0) {
+            this.$message.error('修改失败')
+            console.log(res)
+          }
+          this.getList()
+        }).catch(error => {
+          console.log(error)
+          this.$message.error('修改失败')
+        })
         this.editDialogVisibel = false
       }
     },
     deleteRecord(dataIndex) {
       // ajax deleteNurse(this.data[dataIndex].id)
+      const tmp = this.data[dataIndex]
+      deleteMedical(tmp.examination[0].id).then(res => {
+        if (res.data.code !== 0) {
+          this.$message.error('删除失败')
+          console.log(res)
+        }
+        this.getList()
+      }).catch(error => {
+        console.log(error)
+        this.$message.error('删除失败')
+      })
       console.log(this.examinationData)
     },
     cancel() {
@@ -347,6 +402,14 @@ export default {
     newDialog() {
       this.newDialogVisibel = true
       this.originData = deepClone(this.newData)
+    },
+    age(birthday) {
+      return jsGetAge(birthday)
+    },
+    formatter(row, column, cellValue) {
+      if (cellValue) {
+        return jsGetAge(cellValue)
+      }
     }
   },
   computed: {
@@ -360,24 +423,36 @@ export default {
         if (query.timeRange[0] !== this.today || query.timeRange[1] !== this.today) {
           // ajax 更新列表
           // 参数 searhQuery.timeRange字符串数组
-          this.examinationData = [
-            { name: '吴xx', sex: '男', age: 21, idCard: 610302000000000000, docName: '小明', examination: [{ id: '000010', elderId: 1,
-              docId: 1, date: '2018-04-01', height: '1.70', weight: '67.0', gangong: '正常', xuetang: '100', Cholesterol: '40',
-              danguchun: '50', TG: '40', HDL_Cholesterol: '40', LDL_Cholesterol: '40', shengong: '正常', bchao: '正常' }],
-            visible: false },
-            { name: '吴xx', sex: '男', age: 21, idCard: 111111111, docName: '小明', examination: [{ id: '000011', elderId: 1,
-              docId: 1, date: '2018-04-02', height: '1.70', weight: '67.0', gangong: '正常', xuetang: '100', Cholesterol: '40',
-              danguchun: '50', TG: '40', HDL_Cholesterol: '40', LDL_Cholesterol: '40', shengong: '正常', bchao: '正常' }],
-            visible: false },
-            { name: '吴xx', sex: '男', age: 21, idCard: 111111, docName: '小明', examination: [{ id: '000012', elderId: 1,
-              docId: 1, date: '2018-04-12', height: '1.70', weight: '67.0', gangong: '正常', xuetang: '100', Cholesterol: '40',
-              danguchun: '50', TG: '40', HDL_Cholesterol: '40', LDL_Cholesterol: '40', shengong: '正常', bchao: '正常' }],
-            visible: false },
-            { name: '吴xx', sex: '男', age: 21, idCard: 21000, docName: '小明', examination: [{ id: '000013', elderId: 1,
-              docId: 1, date: '2018-04-12', height: '1.70', weight: '67.0', gangong: '正常', xuetang: '100', Cholesterol: '40',
-              danguchun: '50', TG: '40', HDL_Cholesterol: '40', LDL_Cholesterol: '40', shengong: '正常', bchao: '正常' }],
-            visible: false }
-          ]
+          getMedicalHistory(query.timeRange).then(res => {
+            if (res.data.code !== 0) {
+              this.$message.error('列表初始化失败')
+            }
+            this.examination = res.data.data
+            console.log('search', this.examination)
+            this.searchQuery.timeRange = ''
+          }).catch(error => {
+            console.log(error)
+            this.$message.error('列表初始化失败')
+          })
+          setTimeout(this.dealData, 1000)
+          // this.examinationData = [
+          //   { name: '吴xx', sex: '男', age: 21, idCard: 610302000000000000, docName: '小明', examination: [{ id: '000010', elderId: 1,
+          //     docId: 1, date: '2018-04-01', height: '1.70', weight: '67.0', gangong: '正常', xuetang: '100', Cholesterol: '40',
+          //     danguchun: '50', TG: '40', HDL_Cholesterol: '40', LDL_Cholesterol: '40', shengong: '正常', bchao: '正常' }],
+          //   visible: false },
+          //   { name: '吴xx', sex: '男', age: 21, idCard: 111111111, docName: '小明', examination: [{ id: '000011', elderId: 1,
+          //     docId: 1, date: '2018-04-02', height: '1.70', weight: '67.0', gangong: '正常', xuetang: '100', Cholesterol: '40',
+          //     danguchun: '50', TG: '40', HDL_Cholesterol: '40', LDL_Cholesterol: '40', shengong: '正常', bchao: '正常' }],
+          //   visible: false },
+          //   { name: '吴xx', sex: '男', age: 21, idCard: 111111, docName: '小明', examination: [{ id: '000012', elderId: 1,
+          //     docId: 1, date: '2018-04-12', height: '1.70', weight: '67.0', gangong: '正常', xuetang: '100', Cholesterol: '40',
+          //     danguchun: '50', TG: '40', HDL_Cholesterol: '40', LDL_Cholesterol: '40', shengong: '正常', bchao: '正常' }],
+          //   visible: false },
+          //   { name: '吴xx', sex: '男', age: 21, idCard: 21000, docName: '小明', examination: [{ id: '000013', elderId: 1,
+          //     docId: 1, date: '2018-04-12', height: '1.70', weight: '67.0', gangong: '正常', xuetang: '100', Cholesterol: '40',
+          //     danguchun: '50', TG: '40', HDL_Cholesterol: '40', LDL_Cholesterol: '40', shengong: '正常', bchao: '正常' }],
+          //   visible: false }
+          // ]
         }
       }
 

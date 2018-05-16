@@ -49,7 +49,7 @@ export default{
     return notifications
   },
   addNotification: config => {
-    notifications.push(JSON.parse(config))
+    notifications.push(JSON.parse(config.body))
     return notifications
   }
 }

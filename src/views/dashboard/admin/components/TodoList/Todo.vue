@@ -1,17 +1,17 @@
 <template>
-  <li class="todo" :class="{ completed: todo.done, editing: editing }">
+  <li class="todo" :class="{ completed: todo.status === 1 ? true : false, editing: editing }">
     <div class="view">
       <input class="toggle"
         type="checkbox"
-        :checked="todo.done"
+        :checked="todo.status === 1 ? true : false"
         @change="toggleTodo( todo )">
-      <label v-text="todo.text" @dblclick="editing = true"></label>
+      <label v-text="todo.timestamp + '  ' + todo.eventName"></label>
       <button class="destroy" @click="deleteTodo( todo )"></button>
     </div>
     <input class="edit"
       v-show="editing"
       v-focus="editing"
-      :value="todo.text"
+      :value="todo.eventName"
       @keyup.enter="doneEdit"
       @keyup.esc="cancelEdit"
       @blur="doneEdit">

@@ -10,6 +10,7 @@ const user = {
     name: '',
     avatar: '',
     introduction: '',
+    ids: [],
     roles: [],
     setting: {
       articlePlatform: []
@@ -40,6 +41,9 @@ const user = {
     },
     SET_ROLES: (state, roles) => {
       state.roles = roles
+    },
+    SET_IDS: (state, ids) => {
+      state.ids = ids
     }
   },
 
@@ -71,6 +75,7 @@ const user = {
           if (!response.data) { // 由于mockjs 不支持自定义状态码只能这样hack
             reject('error')
           }
+          // const data = response.data
           const data = response.data.data
           commit('SET_ROLES', data.roles)
           commit('SET_NAME', data.name)
@@ -80,6 +85,17 @@ const user = {
         }).catch(error => {
           reject(error)
         })
+      })
+    },
+
+    // 获取用户可以访问的老人
+    GetFamilyElders({ commit, state }, ids) {
+      return new Promise((resolve, reject) => {
+        commit('SET_IDS', ids)
+        console.log('ids', ids)
+        resolve()
+      }).catch(error => {
+        console.log(error)
       })
     },
 
@@ -100,12 +116,14 @@ const user = {
     // 登出
     LogOut({ commit, state }) {
       return new Promise((resolve, reject) => {
-        logout(state.token).then(() => {
+        logout(state.token).then((res) => {
           commit('SET_TOKEN', '')
           commit('SET_ROLES', [])
           removeToken()
+          console.log('res', res)
           resolve()
         }).catch(error => {
+          console.log(error)
           reject(error)
         })
       })

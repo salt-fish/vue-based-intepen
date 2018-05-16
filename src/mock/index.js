@@ -10,8 +10,8 @@ import olderMessageAPI from './olderMessage'
 // })
 
 // 登录相关
-Mock.mock(/\/login\/login/, 'post', loginAPI.loginByUsername)
-Mock.mock(/\/login\/logout/, 'post', loginAPI.logout)
+Mock.mock(/\/login/, 'post', loginAPI.loginByUsername)
+Mock.mock(/\/logout/, 'post', loginAPI.logout)
 Mock.mock(/\/user\/info\.*/, 'get', loginAPI.getUserInfo)
 
 // 文章相关
@@ -29,7 +29,7 @@ Mock.mock(/\/transaction\/list/, 'get', transactionAPI.getList)
 
 // 老人信息相关
 Mock.mock(/\/older\/info\.*/, 'get', olderMessageAPI.getOlderInfo)
-Mock.mock(/\/getNotification/, 'get', olderMessageAPI.getNotification)
+Mock.mock(/\/events\/listall/, 'get', olderMessageAPI.getNotification)
 Mock.mock(/\/addNotification/, 'post', olderMessageAPI.addNotification)
 Mock.mock(/\/deleteNotification/, 'post', olderMessageAPI.deleteNotification)
 

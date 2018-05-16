@@ -35,7 +35,7 @@ export default {
     }
   },
   mounted() {
-    this.initChart()
+    setTimeout(this.initChart, 1000)
     if (this.autoResize) {
       this.__resizeHanlder = debounce(() => {
         if (this.chart) {
@@ -154,7 +154,7 @@ export default {
           animationDuration: 2800,
           animationEasing: 'cubicInOut'
         }]
-      })
+      }, { notMerge: true })
     },
     initChart() {
       this.chart = echarts.init(this.$el, 'macarons')

@@ -8,20 +8,23 @@ export function getNotification() {
 }
 
 export function addNotification(notification) {
-  const data = JSON.stringify(notification)
+  // const data = JSON.stringify(notification)
   return request({
-    url: '/addNotification',
+    url: '/events/add',
     method: 'post',
-    data
+    data: notification
   })
 }
 
-export function deleteNotification(notification) {
-  // const data = JSON.stringify(notification)
+export function deleteNotification(id) {
+  const data = JSON.stringify({
+    'ids': [id]
+  })
+  // const ids = [id]
   return request({
-    url: '/deleteNotification',
+    url: '/events/complete',
     method: 'post',
-    data: notification
+    data: data
   })
 }
 

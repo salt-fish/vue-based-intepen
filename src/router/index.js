@@ -43,17 +43,6 @@ export const constantRouterMap = [
       meta: { title: '首页', icon: 'dashboard', noCache: true }
     }]
   }
-  // {
-  //   path: '/documentation',
-  //   component: Layout,
-  //   redirect: '/documentation/index',
-  //   children: [{
-  //     path: 'index',
-  //     component: _import('documentation/index'),
-  //     name: 'documentation',
-  //     meta: { title: '文档', icon: 'documentation', noCache: true }
-  //   }]
-  // }
 ]
 
 export default new Router({
@@ -63,32 +52,17 @@ export default new Router({
 })
 
 export const asyncRouterMap = [
-  // {
-  //   path: '/permission',
-  //   component: Layout,
-  //   redirect: '/permission/index',
-  //   meta: { roles: ['admin'] }, // you can set roles in root nav
-  //   children: [{
-  //     path: 'index',
-  //     component: _import('permission/index'),
-  //     name: 'permission',
-  //     meta: {
-  //       title: '权限测试页',
-  //       icon: 'lock',
-  //       roles: ['admin'] // or you can only set roles in sub nav
-  //     }
-  //   }]
-  // },
 
   {
     path: '/userDetail',
     component: Layout,
-    redirect: '/userDetail/index', //  /:id
+    redirect: '/userDetail/index_e_:elderId', //  /:id
     meta: {
       roles: ['userDetail']
     },
+    hidden: true,
     children: [{
-      path: 'index', //  /:id
+      path: 'index_e_:elderId', //  /:id
       component: _import('userDetail/index'),
       name: 'userDetail',
       meta: {
@@ -274,171 +248,6 @@ export const asyncRouterMap = [
       }
     }]
   },
-
-  // {
-  //   path: '/icon',
-  //   component: Layout,
-  //   children: [{
-  //     path: 'index',
-  //     component: _import('svg-icons/index'),
-  //     name: 'icons',
-  //     meta: { title: '图标', icon: 'icon', noCache: true }
-  //   }]
-  // },
-
-  // {
-  //   path: '/components',
-  //   component: Layout,
-  //   redirect: 'noredirect',
-  //   name: 'component-demo',
-  //   meta: {
-  //     title: '组件',
-  //     icon: 'component'
-  //   },
-  //   children: [
-  //     { path: 'tinymce', component: _import('components-demo/tinymce'), name: 'tinymce-demo', meta: { title: '富文本编辑器' }},
-  //     { path: 'markdown', component: _import('components-demo/markdown'), name: 'markdown-demo', meta: { title: 'Markdown' }},
-  //     { path: 'json-editor', component: _import('components-demo/jsonEditor'), name: 'jsonEditor-demo', meta: { title: 'JSON编辑器' }},
-  //     { path: 'dnd-list', component: _import('components-demo/dndList'), name: 'dndList-demo', meta: { title: '列表拖拽' }},
-  //     { path: 'splitpane', component: _import('components-demo/splitpane'), name: 'splitpane-demo', meta: { title: 'Splitpane' }},
-  //     { path: 'avatar-upload', component: _import('components-demo/avatarUpload'), name: 'avatarUpload-demo', meta: { title: '头像上传' }},
-  //     { path: 'dropzone', component: _import('components-demo/dropzone'), name: 'dropzone-demo', meta: { title: 'Dropzone' }},
-  //     { path: 'sticky', component: _import('components-demo/sticky'), name: 'sticky-demo', meta: { title: 'Sticky' }},
-  //     { path: 'count-to', component: _import('components-demo/countTo'), name: 'countTo-demo', meta: { title: 'CountTo' }},
-  //     { path: 'mixin', component: _import('components-demo/mixin'), name: 'componentMixin-demo', meta: { title: '小组件' }},
-  //     { path: 'back-to-top', component: _import('components-demo/backToTop'), name: 'backToTop-demo', meta: { title: '返回顶部' }}
-  //   ]
-  // },
-
-  // {
-  //   path: '/charts',
-  //   component: Layout,
-  //   redirect: 'noredirect',
-  //   name: 'charts',
-  //   meta: {
-  //     title: '图表',
-  //     icon: 'chart'
-  //   },
-  //   children: [
-  //     { path: 'keyboard', component: _import('charts/keyboard'), name: 'keyboardChart', meta: { title: '键盘图表', noCache: true }},
-  //     { path: 'line', component: _import('charts/line'), name: 'lineChart', meta: { title: '折线图', noCache: true }},
-  //     { path: 'mixchart', component: _import('charts/mixChart'), name: 'mixChart', meta: { title: '混合图表', noCache: true }}
-  //   ]
-  // },
-
-  // {
-  //   path: '/example',
-  //   component: Layout,
-  //   redirect: '/example/table/complex-table',
-  //   name: 'example',
-  //   meta: {
-  //     title: '综合实例',
-  //     icon: 'example'
-  //   },
-  //   children: [
-  //     {
-  //       path: '/example/table',
-  //       component: _import('example/table/index'),
-  //       redirect: '/example/table/complex-table',
-  //       name: 'Table',
-  //       meta: {
-  //         title: 'Table',
-  //         icon: 'table'
-  //       },
-  //       children: [
-  //         { path: 'dynamic-table', component: _import('example/table/dynamicTable/index'), name: 'dynamicTable', meta: { title: '动态Table' }},
-  //         { path: 'drag-table', component: _import('example/table/dragTable'), name: 'dragTable', meta: { title: '拖拽Table' }},
-  //         { path: 'inline-edit-table', component: _import('example/table/inlineEditTable'), name: 'inlineEditTable', meta: { title: 'Table内编辑' }},
-  //         { path: 'tree-table', component: _import('example/table/treeTable/treeTable'), name: 'treeTableDemo', meta: { title: '树形表格' }},
-  //         { path: 'custom-tree-table', component: _import('example/table/treeTable/customTreeTable'), name: 'customTreeTableDemo', meta: { title: '自定义树表' }},
-  //         { path: 'complex-table', component: _import('example/table/complexTable'), name: 'complexTable', meta: { title: '综合Table' }}
-  //       ]
-  //     },
-  //     { path: 'tab/index', icon: 'tab', component: _import('example/tab/index'), name: 'tab', meta: { title: 'Tab' }}
-  //   ]
-  // },
-
-  // {
-  //   path: '/form',
-  //   component: Layout,
-  //   redirect: 'noredirect',
-  //   name: 'form',
-  //   meta: {
-  //     title: '表单',
-  //     icon: 'form'
-  //   },
-  //   children: [
-  //     { path: 'create-form', component: _import('form/create'), name: 'createForm', meta: { title: '创建表单', icon: 'table' }},
-  //     { path: 'edit-form', component: _import('form/edit'), name: 'editForm', meta: { title: '编辑表单', icon: 'table' }}
-  //   ]
-  // },
-
-  // {
-  //   path: '/error',
-  //   component: Layout,
-  //   redirect: 'noredirect',
-  //   name: 'errorPages',
-  //   meta: {
-  //     title: '错误页面',
-  //     icon: '404'
-  //   },
-  //   children: [
-  //     { path: '401', component: _import('errorPage/401'), name: 'page401', meta: { title: '401', noCache: true }},
-  //     { path: '404', component: _import('errorPage/404'), name: 'page404', meta: { title: '404', noCache: true }}
-  //   ]
-  // },
-
-  // {
-  //   path: '/error-log',
-  //   component: Layout,
-  //   redirect: 'noredirect',
-  //   children: [{ path: 'log', component: _import('errorLog/index'), name: 'errorLog', meta: { title: '错误日志', icon: 'bug' }}]
-  // },
-
-  // {
-  //   path: '/excel',
-  //   component: Layout,
-  //   redirect: '/excel/export-excel',
-  //   name: 'excel',
-  //   meta: {
-  //     title: 'Excel',
-  //     icon: 'excel'
-  //   },
-  //   children: [
-  //     { path: 'export-excel', component: _import('excel/exportExcel'), name: 'exportExcel', meta: { title: 'Export Excel' }},
-  //     { path: 'export-selected-excel', component: _import('excel/selectExcel'), name: 'selectExcel', meta: { title: 'Export Selected' }},
-  //     { path: 'upload-excel', component: _import('excel/uploadExcel'), name: 'uploadExcel', meta: { title: 'Upload Excel' }}
-  //   ]
-  // },
-
-  // {
-  //   path: '/zip',
-  //   component: Layout,
-  //   redirect: '/zip/download',
-  //   alwaysShow: true,
-  //   meta: { title: 'Zip', icon: 'zip' },
-  //   children: [{ path: 'download', component: _import('zip/index'), name: 'exportZip', meta: { title: 'Export Zip' }}]
-  // },
-
-  // {
-  //   path: '/theme',
-  //   component: Layout,
-  //   redirect: 'noredirect',
-  //   children: [{ path: 'index', component: _import('theme/index'), name: 'theme', meta: { title: '换肤', icon: 'theme' }}]
-  // },
-
-  // {
-  //   path: '/clipboard',
-  //   component: Layout,
-  //   redirect: 'noredirect',
-  //   children: [{ path: 'index', component: _import('clipboard/index'), name: 'clipboardDemo', meta: { title: 'Clipboard', icon: 'clipboard' }}]
-  // },
-
-  // {
-  //   path: '/i18n',
-  //   component: Layout,
-  //   children: [{ path: 'index', component: _import('i18n-demo/index'), name: 'i18n', meta: { title: '国际化', icon: 'international' }}]
-  // },
 
   { path: '*', redirect: '/404', hidden: true }
 ]

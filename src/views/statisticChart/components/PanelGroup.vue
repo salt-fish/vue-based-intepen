@@ -1,11 +1,11 @@
 <template>
   <el-row class="panel-group" :gutter="10">
 
-    <el-col :xs="8" :sm="8" :lg="4" class="card-panel-col" v-for="(item, index) in groupData.data" v-if="index <= 4" :key="index">
-      <div class='card-panel' @click="handleSetLineChartData(groupData.name[index])">
+    <el-col :xs="8" :sm="8" :lg="4" class="card-panel-col" v-for="(item, index) in groupData.all.type" v-if="index <= 4" :key="index">
+      <div class='card-panel' @click="handleSetLineChartData(groupData.all.name[index])">
         <div class="card-panel-description">
-          <div class="card-panel-text">{{ item.name }}</div>
-          <count-to class="card-panel-num" :startVal="0" :endVal="item.value" :duration="2600"></count-to>
+          <div class="card-panel-text">{{ groupData.all.type[index] }}</div>
+          <count-to class="card-panel-num" :startVal="0" :endVal="groupData.all[groupData.all.name[index]][groupData.all[groupData.all.name[index]].length - 1]" :duration="2600"></count-to>
         </div>
       </div>
     </el-col>
